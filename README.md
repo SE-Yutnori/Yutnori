@@ -15,6 +15,7 @@
 ## 윷놀이 게임 기능
 1. VIEW
 <img width="221" alt="image" src="https://github.com/user-attachments/assets/9b8940b3-c247-4d42-b39b-64a7939e972e" />
+
 - 윷놀이 판은 다음 그림과 같이 진행
   - 윷놀이 판은 사각형, 오각형, 육각형까지 선택
 - 각 참여자의 말 현재 위치 표시
