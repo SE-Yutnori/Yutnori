@@ -1,3 +1,9 @@
+**❗️프로젝트 실행 방법❗️**
+```
+javac -d out $(find src -name "*.java")
+java -cp out Main
+```
+
 # 윷놀이 프로젝트
 
 ## 윷놀이 기본 사항
