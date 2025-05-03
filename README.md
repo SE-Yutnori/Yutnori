@@ -4,7 +4,7 @@ javac -d out $(find src -name "*.java")
 java -cp out Main
 ```
 
-# 윷놀이 프로젝트
+# 윷놀이 프로젝트 개요
 
 ## 윷놀이 기본 사항
 - **OOAD(+MVC 아키텍처 패턴)기법** 적용
