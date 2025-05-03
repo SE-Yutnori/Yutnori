@@ -1,5 +1,8 @@
 # 유스케이스 모델
 
+## 유스케이스 다이어그램
+<img width="717" alt="image" src="https://github.com/user-attachments/assets/efd1917d-ba1a-4089-a98e-252f0472c257" />
+
 ## 유스케이스 텍스트(Casual)
 1. 윷놀이 판 디자인: 윷놀이 판을 사각형, 오각형, 육각형으로 선택하여 구성
 2. 게임 설정: 참여자 수, 말 개수 선택 구성
