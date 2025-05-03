@@ -95,6 +95,15 @@ public class GameLauncher {
     //사용할 말의 갯수를 입력 받는 메서드 (2-5명)
     private int getTokenCount(){
         int tokenCount = 0;
+        while (tokenCount < 2 || tokenCount > 5) { //2-5 사이의 말의 갯수를 입력할 때까지 반복
+            String input = JOptionPane.showInputDialog(null, "플레이어가 사용할 말의 갯수를 입력하세요. (2 - 5개):", "말 갯수 설정", JOptionPane.QUESTION_MESSAGE);
+            if (input == null) System.exit(0); // 예외처리 : 취소 혹은 창 닫기를 누를 시 종료.
+            try {
+                tokenCount = Integer.parseInt(input.trim());
+            } catch (NumberFormatException e) {//예외처리 : 잘못된 입력은 무시하고 재입력하게끔
+                tokenCount = 0;
+            }
+        }
         return tokenCount;
     }
 }
