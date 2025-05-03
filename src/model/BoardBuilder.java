@@ -54,6 +54,29 @@ public class BoardBuilder {
             }
         }
 
+        // 골목길(센터로 가는) 노드 만들기
+        for (int i = 0; i < sides; i++) {
+            float cx = edgeNodes[i][0].getX();
+            float cy = edgeNodes[i][0].getY();
+
+            float dx = centerX - cx;
+            float dy = centerY - cy;
+
+            float midX1 = cx + dx / 3f;
+            float midY1 = cy + dy / 3f;
+            float midX2 = cx + dx * 2 / 3f;
+            float midY2 = cy + dy * 2 / 3f;
+
+            BoardNode path1 = new BoardNode("ToCenter" + i + "-1", midX1, midY1, sides);
+            BoardNode path2 = new BoardNode("ToCenter" + i + "-2", midX2, midY2, sides);
+
+            toCenterPath1[i] = path1;
+            toCenterPath2[i] = path2;
+
+            nodes.add(path1);
+            nodes.add(path2);
+        }
+
         return nodes;
     }
 }
