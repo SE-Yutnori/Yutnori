@@ -77,6 +77,29 @@ public class BoardBuilder {
             nodes.add(path2);
         }
 
+        // 각 노드 연결 (분기 및 이동 방향 고려, 사실 빽도를 제외하고는 전부 정방향 이동 - 결국은 도착지로 가게끔)
+        for (int i = 0; i < sides; i++) {
+            // 외곽 노드 연결
+            for (int j = 0; j < 5; j++) {
+                edgeNodes[i][j].addNextNode(edgeNodes[i][j + 1]);
+            }
+
+            // 꼭짓점과 센터 노드 연결
+            if (i != 0 && i <= (sides + 1) / 2) {
+                edgeNodes[i][0].addNextNode(toCenterPath1[i]);
+                toCenterPath1[i].addNextNode(toCenterPath2[i]);
+                toCenterPath2[i].addNextNode(center);
+            } else {
+                center.addNextNode(toCenterPath2[i]);
+                toCenterPath2[i].addNextNode(toCenterPath1[i]);
+                if (i == 0) {
+                    toCenterPath1[i].addNextNode(edgeNodes[sides - 1][5]);
+                } else {
+                    toCenterPath1[i].addNextNode(edgeNodes[i - 1][5]);
+                }
+            }
+        }
+
         return nodes;
     }
 }
