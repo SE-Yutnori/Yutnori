@@ -1,6 +1,10 @@
 package view;
 
+import model.BoardBuilder;
+import model.BoardNode;
+
 import javax.swing.*;
+import java.util.List;
 
 //게임을 시작하는 class
 public class GameLauncher {
@@ -14,8 +18,14 @@ public class GameLauncher {
     public void start() {
         // JFrame 생성, Panel 추가 등 모든 UI 설정 코드
         SwingUtilities.invokeLater(() -> {
+
             // boardCustom() model
             int sides = boardCustom();
+
+            // sides 이용하여 BoardBuilder의 buildCustomizingBoard 메서드를 불러와 BoardNode 리스트 생성
+            List<BoardNode> board = BoardBuilder.buildCustomizingBoard(sides, 2f);
+
+
         });
     }
     // 사용자에게 n각형 커스터마이징을 입력받는 메서드
