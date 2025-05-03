@@ -31,6 +31,9 @@ public class GameLauncher {
 
             // 내부에서 getPlayerCount() 메서드를 내부에서 불러와 플레이어 정보(플레이어 수, 플레이어 이름, 말 수)를 입력받음
             List<Player> players = getPlayers();
+
+            // 사이드 Player와 READY tokenState 표시 패널 생성
+            JPanel statusPanel = new JPanel();
         });
     }
 
