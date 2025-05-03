@@ -33,7 +33,11 @@ public class GameLauncher {
             List<Player> players = getPlayers();
         });
     }
-    // 사용자에게 n각형 커스터마이징을 입력받는 메서드
+
+    /**
+     * 사용자에게 n각형 커스터마이징을 입력받는 메서드
+     * @return : sides(입력받은 n값 반환)
+     */
     private int boardCustom() {
         int sides = 0;
         while (sides < 3) { //입력이 올바르게 될 때까지 반복
@@ -48,7 +52,10 @@ public class GameLauncher {
         return sides; //입력받은 n값을 반환.
     }
 
-    //플레이어 정보를 입력 받는 메서드 (플레이어 수 , 플레이어 이름, 사용할 말의 갯수)
+    /**
+     * 플레이어 정보를 입력 받는 메서드 (플레이어 수 , 플레이어 이름, 사용할 말의 갯수)
+     * @return : List[Player]
+     */
     private List<Player> getPlayers() {
         int numPlayers = getPlayerCount(); //사용자 수를 입력받는 메서드
         int numTokens = getTokenCount(); //사용할 말의 갯수를 입력받는 메서드
@@ -77,7 +84,10 @@ public class GameLauncher {
         return players;
     }
 
-    // 플레이어 수를 입력받는 메서드 (2-4명)
+    /**
+     * 플레이어 수를 입력받는 메서드 (2-4명)
+     * @return : numPlayers
+     */
     private int getPlayerCount() {
         int numPlayers = 0;
         while (numPlayers < 2 || numPlayers > 4) { //2-4 사이의 플레이어 수를 입력할 때까지 반복
@@ -92,7 +102,10 @@ public class GameLauncher {
         return numPlayers;
     }
 
-    //사용할 말의 갯수를 입력 받는 메서드 (2-5명)
+    /**
+     * 사용할 말의 갯수를 입력 받는 메서드 (2-5명)
+     * @return : tokenCount
+     */
     private int getTokenCount(){
         int tokenCount = 0;
         while (tokenCount < 2 || tokenCount > 5) { //2-5 사이의 말의 갯수를 입력할 때까지 반복
