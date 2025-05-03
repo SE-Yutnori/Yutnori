@@ -1,5 +1,7 @@
 package view;
 
+import javax.swing.*;
+
 //게임을 시작하는 class
 public class GameLauncher {
     /**
@@ -10,6 +12,24 @@ public class GameLauncher {
      * 4. 플레이어가 사용할 말 개수
      */
     public void start() {
+        // JFrame 생성, Panel 추가 등 모든 UI 설정 코드
+        SwingUtilities.invokeLater(() -> {
+            // boardCustom() model
+            int sides = boardCustom();
+        });
+    }
+    // 사용자에게 n각형 커스터마이징을 입력받는 메서드
+    private int boardCustom() {
+        int sides = 0;
+        while (sides < 3) { //입력이 올바르게 될 때까지 반복
+            String input = JOptionPane.showInputDialog(null, "몇 각형 보드로 커스텀할까요? (권장 4-6)");
+            if (input == null) System.exit(0); //예외처리 : 취소 혹은 창 닫기를 누를 시 종료.
+            try {
+                sides = Integer.parseInt(input);
+            } catch (NumberFormatException e) {//예외처리 : 잘못된 입력은 무시하고 재입력하게끔
+                sides = 0;
+            }
+        }
+        return sides; //입력받은 n값을 반환.
     }
 }
-
