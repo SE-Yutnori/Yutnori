@@ -80,6 +80,15 @@ public class GameLauncher {
     // 플레이어 수를 입력받는 메서드 (2-4명)
     private int getPlayerCount() {
         int numPlayers = 0;
+        while (numPlayers < 2 || numPlayers > 4) { //2-4 사이의 플레이어 수를 입력할 때까지 반복
+            String input = JOptionPane.showInputDialog(null, "플레이어 수를 입력하세요 (2 - 4명)");
+            if (input == null) System.exit(0); // 예외처리 : 취소 혹은 창 닫기를 누를 시 종료.
+            try {
+                numPlayers = Integer.parseInt(input);
+            } catch (NumberFormatException e) {//예외처리 : 잘못된 입력은 무시하고 재입력하게끔
+                numPlayers = 0;
+            }
+        }
         return numPlayers;
     }
 
