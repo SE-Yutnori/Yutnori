@@ -9,7 +9,7 @@ import java.util.function.Function;
 //말에 대한 정보가 담긴 클래스
 public class Token {
     private String name;
-    // private Player owner;
+    private Player owner;
     private BoardNode currentNode;
     private boolean finished = false;
     private int index;
