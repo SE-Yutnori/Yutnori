@@ -8,9 +8,8 @@ public class BoardNode {
     private String name;                  // 노드 이름 (예: Edge0-1, Center 등)
     private float x, y;                   // 좌표
     private List<BoardNode> nextNodes;    // 다음 노드들
-    private List<BoardNode> prevNodes;    // <-- 역방향 연결을 위한 리스트
     private List<Token> tokens;           // 현재 올라와 있는 토큰들
-    private int sides;                    // ▶️ 보드의 각 수 (중앙 경로 분기 판단용)
+    private int sides;                    // 보드의 각 수 (중앙 경로 분기 판단용)
 
     /**
      * BoardNode 생성자
