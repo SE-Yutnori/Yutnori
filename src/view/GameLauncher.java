@@ -1,10 +1,13 @@
 package view;
 
+import controller.GameController;
 import model.BoardBuilder;
 import model.BoardNode;
 import model.Player;
+import model.YutGameRules;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,11 +32,47 @@ public class GameLauncher {
             // sides 이용하여 BoardBuilder의 buildCustomizingBoard 메서드를 불러와 BoardNode 리스트 생성
             List<BoardNode> board = BoardBuilder.buildCustomizingBoard(sides, 2f);
 
+            // 내부에서 findStartNode 메서드를 불러와 시작 노드 찾기 (Edge0-0이 시작 노드)
+            BoardNode startNode = findStartNode(board);
+
+            // 내부에서 getTestMode() 를 불러옴
+            boolean testMode = getTestMode();
+            // YutGameRules의 setTestMode에 전달
+            YutGameRules.setTestMode(testMode);
+
             // 내부에서 getPlayerCount() 메서드를 내부에서 불러와 플레이어 정보(플레이어 수, 플레이어 이름, 말 수)를 입력받음
             List<Player> players = getPlayers();
 
+            // 보드 UI
+            BoardPanel boardPanel = new BoardPanel(board, players);
+
             // 사이드 Player와 READY tokenState 표시 패널 생성
             JPanel statusPanel = new JPanel();
+
+            statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+            statusPanel.setPreferredSize(new Dimension(200, 600));
+
+            InGameView inGameView = new InGameView(boardPanel, players, statusPanel);
+            GameController controller = new GameController(players, inGameView, startNode);
+
+            // 오른쪽 상태창(player의 남은 말들이 표시) 출력
+            inGameView.buildStatusPanel();
+
+            // 윷 던지기 버튼
+            JButton rollButton = new JButton("윷 던지기");
+            rollButton.addActionListener(e -> controller.rollingYut());
+
+            // 프레임
+            JFrame frame = new JFrame("윷놀이");
+            frame.setLayout(new BorderLayout());
+            frame.add(boardPanel, BorderLayout.CENTER);
+            frame.add(statusPanel, BorderLayout.EAST);
+            frame.add(rollButton, BorderLayout.SOUTH);
+
+            frame.pack();
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
         });
     }
 
@@ -53,6 +92,30 @@ public class GameLauncher {
             }
         }
         return sides; //입력받은 n값을 반환.
+    }
+
+    // 보드에서 이름이 "Edge0-0" 인 노드를 시작 노드로 찾는 메서드
+    private BoardNode findStartNode(List<BoardNode> board) {
+        for (BoardNode node : board) {
+            if (node.getName().equals("Edge0-0")) {
+                return node;
+            }
+        }
+        // 테스트 용 코드를 그냥 살려둔거... 예외 처리 (시작 노드를 찾지 못한 경우)
+        JOptionPane.showMessageDialog(null, "시작 노드를 찾을 수 없습니다.", "에러", JOptionPane.ERROR_MESSAGE);
+        System.exit(1);
+        return null;
+    }
+
+    // 테스트 모드 여부를 사용자에게 물어보고 반환하는 메서드
+    private boolean getTestMode() {
+        String modeInput = JOptionPane.showInputDialog(
+                null,
+                "테스트 모드로 진행하시겠습니까? (Y/N)",
+                "게임 모드 선택",
+                JOptionPane.QUESTION_MESSAGE
+        );
+        return (modeInput != null && modeInput.trim().equalsIgnoreCase("Y"));
     }
 
     /**
