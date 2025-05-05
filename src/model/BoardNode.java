@@ -24,7 +24,6 @@ public class BoardNode {
         this.y = y;
         this.sides = sides;
         this.nextNodes = new ArrayList<>();
-        this.prevNodes = new ArrayList<>(); // 초기화
         this.tokens = new ArrayList<>();
     }
 
