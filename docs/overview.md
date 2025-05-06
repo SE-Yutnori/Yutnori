@@ -21,6 +21,8 @@
     1. Domain Layer
   
     2. MVC Architecture
+  
+    3. UI 설계 독립성
 
 5. Detailed Design (Lec.19)
 
