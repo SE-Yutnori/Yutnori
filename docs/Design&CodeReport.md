@@ -1,4 +1,4 @@
-<H1>설계 및 구현 리포트 구성</H1>
+# 설계 및 구현 리포트 구성
 
 1. 개요 (**OOAD** Lec 6.1, Lec2)
 
@@ -27,5 +27,3 @@
 5. Detailed Design (Lec.19)
 
     1. Interaction Diagram
-
-
