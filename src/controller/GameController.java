@@ -11,7 +11,7 @@ import java.util.List;
 public class GameController {
     private final List<Player> players;
     private final InGameView view;
-    private int currentPlayerIndex = 0;
+    public static int currentPlayerIndex = 0;
     private final BoardNode startNode;
 
     public GameController(List<Player> players, InGameView view, BoardNode startNode) {
