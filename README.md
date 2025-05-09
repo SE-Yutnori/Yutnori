@@ -49,3 +49,17 @@ java -cp out Main
 - 각 말들의 정보(소유자, 현재 노드, 이전 턴에 지나온 노드 - 빽도 등..) 구현
   - 말들의 현재 상태를 표시하기 위한 enum 구현
 - 게임 규칙(잡기, 업기, 이동, 분기 등..)에 대한 구현
+
+## OOAD 기법
+- OOAD 기법은 Object-Oriented Analysis, Object-Oriented Design으로 분류됨
+- OOA는 도메인 컨셉을 찾아가는 방식, OOD는 소프트웨어 객체 정의를 통한 요구 분석 이행을 목표로 하는 방식
+- OOAD 기법의 산출물(Artifact)는 Use-Case, Domain Model, Interaction Diagram, Class Diagram이 있음
+- 다음의 산출물은 docs 폴더에 정리하여 진행됨
+1. Requirement Process
+- `/UseCaseModel`을 참고하여 UseCaseModel(UseCaseText, UseCaseDiagram, System Sequence Diagram) 확인
+2. Analysis Process
+- `DomainModel.jpg`을 참고하여 Domain Model 확인 
+3. Architectural/Detailed Design Process
+- `Design&CodeReport.md`를 참고하여 해당 리포트와 Interaction Diagram/Class Diagram 확인
+4. Implementation/Testing Process
+- `TestReport.md`를 참고하여 JUnit을 통한 리포트 확인
