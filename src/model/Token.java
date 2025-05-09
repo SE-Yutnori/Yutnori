@@ -156,7 +156,7 @@ public class Token {
 
         // 뒤로 한 칸 이동
         while (steps > 0) {
-            if(history.size() <= 0  && Objects.equals(currentNode.getName(), "Edge0-0")) {
+            if(history.isEmpty() && currentNode.getName().equals("Edge0-0")) {
                 state = TokenState.FINISHED;
                 break;
             }
