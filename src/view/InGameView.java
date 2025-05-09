@@ -4,8 +4,6 @@ import model.Player;
 import model.Token;
 import model.TokenState;
 
-import controller.GameController;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -192,12 +190,6 @@ public class InGameView {
     // 현재 각 플레이어의 말 상태를 표시해주는 메서드 (대기 중인 말만 보이게)
     public void buildStatusPanel() {
         statusPanel.removeAll(); // 이전 컴포넌트 모두 제거
-        
-        int currentPlayerIndex = GameController.currentPlayerIndex;
-        Player currentPlayer = players.get(currentPlayerIndex);
-        JLabel whoseTurn = new JLabel("now " + currentPlayer.getName() + " turn!!\n");
-        whoseTurn.setFont(new Font("Arial", Font.BOLD, 20));
-        statusPanel.add(whoseTurn);
         
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
