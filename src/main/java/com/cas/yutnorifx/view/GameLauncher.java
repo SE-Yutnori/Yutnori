@@ -7,7 +7,6 @@ import com.cas.yutnorifx.model.Player;
 import com.cas.yutnorifx.model.YutGameRules;
 
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.util.ArrayList;

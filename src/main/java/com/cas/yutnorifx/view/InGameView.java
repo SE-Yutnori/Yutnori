@@ -5,7 +5,6 @@ import com.cas.yutnorifx.model.Player;
 import com.cas.yutnorifx.model.Token;
 import com.cas.yutnorifx.model.TokenState;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
