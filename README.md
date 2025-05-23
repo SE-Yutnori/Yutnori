@@ -63,7 +63,3 @@ src/main/java/com/cas/yutnorifx/
 1. `JAVAFX_HOME` 환경 변수가 올바르게 설정되었는지 확인
 2. JavaFX SDK 버전이 Java 23과 호환되는지 확인
 3. Gradle 버전이 8.5 이상인지 확인
-
-## 라이선스
-
-이 프로젝트는 MIT 라이선스를 따릅니다. 
