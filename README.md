@@ -37,7 +37,7 @@ JavaFX를 사용한 윷놀이 게임입니다.
 
 ```
 src/main/java/com/cas/yutnorifx/
-├── HelloApplication.java    # JavaFX 애플리케이션 진입점
+├── YutnoriGameFX.java    # JavaFX 애플리케이션 진입점
 ├── controller/             # 게임 컨트롤러
 ├── model/                  # 게임 모델 (보드, 플레이어, 토큰 등)
 └── view/                   # JavaFX 기반 UI 컴포넌트
