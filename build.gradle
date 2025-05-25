@@ -43,6 +43,7 @@ java {
 
 dependencies {
   testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+  testImplementation "org.junit.platform:junit-platform-suite:1.10.2"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }
 
