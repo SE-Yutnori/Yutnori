@@ -28,6 +28,8 @@ public class InGameView {
     private final Color[] playerColors = {
             Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA
     };
+
+    //runnable 타입의 onRollYut 변수 선언
     private Runnable onRollYut;
 
     // InGameView 생성자
