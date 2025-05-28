@@ -11,6 +11,7 @@ public class BoardBuilder {
             throw new IllegalArgumentException("보드는 최소 3각형 이상이어야 합니다.");
         }
 
+        //BoardNode 리스트 생성
         List<BoardNode> nodes = new ArrayList<>();
 
         //Center노드의 X,Y 좌표 설정

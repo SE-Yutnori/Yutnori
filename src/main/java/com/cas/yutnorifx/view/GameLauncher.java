@@ -24,15 +24,30 @@ public class GameLauncher {
      * 4. 플레이어가 사용할 말 개수
      */
     public void start() {
+        
         javafx.application.Platform.runLater(() -> {
+            // 보드 커스타미이징 메서드 호출
             int sides = boardCustom();
+
+            // 리스트 형태로 보드판 생성
             List<BoardNode> board = BoardBuilder.buildCustomizingBoard(sides, 2f);
+
+            // 시작노드 저장
             BoardNode startNode = findStartNode(board);
+
+            // 테스트 모드 여부 입력받기
             boolean testMode = getTestMode();
+            
+            // 테스트 모드 true false에 따라서 설정
             YutGameRules.setTestMode(testMode);
+
+            // 플레이어 수 입력 + 이름 설정 + 사용할 말 갯수 설정
             List<Player> players = getPlayers();
 
+            // 게임 화면 생성
             InGameView inGameView = new InGameView(board, players);
+
+            // 게임 컨트롤러 생성
             GameController controller = new GameController(players, inGameView, startNode);
             inGameView.setOnRollYut(() -> controller.rollingYut());
 
@@ -48,18 +63,25 @@ public class GameLauncher {
      * @return : sides(입력받은 n값 반환)
      */
     private int boardCustom() {
+        //JavaFX 텍스트 입력 대화상자 실행
         TextInputDialog dialog = new TextInputDialog("4");
         dialog.setTitle("보드 커스터마이징");
         dialog.setContentText("몇 각형 보드로 커스텀할까요? (권장 4-6)");
         
         while (true) {
+            //showAndWait() : 대화상자를 보여주고 사용자가 확인 버튼을 누를 때까지 대기
+            //orElse(null) : 사용자가 대화상자를 닫으면 null을 반환
             String result = dialog.showAndWait().orElse(null);
+            //사용자가 대화상자를 닫으면 프로그램 종료
             if (result == null) System.exit(0);
+
             try {
+                //입력받은 값을 정수로 변환
                 int sides = Integer.parseInt(result);
-                if (sides >= 3) return sides;
+                //4 이상 6 이하인 경우 반환
+                if (sides >= 4 && sides <= 6) return sides;
             } catch (NumberFormatException e) {
-                // 무시하고 다시 입력받음
+                // 4 이상 6 이하가 아닌 경우 무시하고 다시 입력받음
             }
         }
     }
@@ -138,13 +160,18 @@ public class GameLauncher {
         dialog.setContentText("플레이어 수를 입력하세요 (2 - 4명)");
         
         while (true) {
+            //showAndWait() : 대화상자를 보여주고 사용자가 확인 버튼을 누를 때까지 대기
+            //orElse(null) : 사용자가 대화상자를 닫으면 null을 반환
             String result = dialog.showAndWait().orElse(null);
+            //사용자가 대화상자를 닫으면 프로그램 종료
             if (result == null) System.exit(0);
             try {
+                //입력받은 값을 정수로 변환
                 int count = Integer.parseInt(result);
+                //2-4명인 경우 반환
                 if (count >= 2 && count <= 4) return count;
             } catch (NumberFormatException e) {
-                // 무시하고 다시 입력받음
+                // 2-4명이 아닌 경우 무시하고 다시 입력받음
             }
         }
     }

@@ -16,20 +16,32 @@ import javafx.stage.Stage;
 import java.util.List;
 
 public class InGameView {
+    // 보드 뷰
     private final BoardView boardView;
+    // 플레이어 리스트 (이름, Token 리스트 보유)
     private final List<Player> players;
+    // 오른쪽에 나타나는 상태 패널
+    // VBox : 수직 레이아웃 컨테이너
     private final VBox statusPanel;
+
+    // 플레이어 색상 배열
     private final Color[] playerColors = {
             Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA
     };
     private Runnable onRollYut;
 
+    // InGameView 생성자
     public InGameView(List<BoardNode> board, List<Player> players) {
         this.players = players;
         this.boardView = new BoardView(board, players);
+
+        //상태패널 VBox 생성
         this.statusPanel = new VBox(10);
+        //패널 패딩 설정
         this.statusPanel.setPadding(new Insets(10));
+        //패널 너비 설정
         this.statusPanel.setPrefWidth(200);
+        //상태패널 빌드
         buildStatusPanel();
     }
 
@@ -152,25 +164,39 @@ public class InGameView {
     }
 
     private void buildStatusPanel() {
+        //상태패널 자식 노드 제거
         statusPanel.getChildren().clear();
-        
+
+        //플레이어 수만큼 반복
         for (int i = 0; i < players.size(); i++) {
+            //플레이어 객체 가져오기
             Player player = players.get(i);
-            
+
+            //플레이어 이름 레이블 생성
             Label playerLabel = new Label("<< " + player.getName() + " >>");
+            //플레이어 이름 레이블 폰트 설정
             playerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+            //상태패널에 플레이어 이름 레이블 추가
             statusPanel.getChildren().add(playerLabel);
             
+            //플레이어 토큰 수만큼 반복
             for (Token token : player.getTokens()) {
+                //토큰 상태가 READY인 경우
                 if (token.getState() == TokenState.READY) {
+                    //HBox : 수평 레이아웃 컨테이너
                     HBox tokenBox = new HBox(5);
+                    //Circle : 원형 모양 노드
                     Circle circle = new Circle(5, playerColors[i % playerColors.length]);
+                    //Label : 텍스트 레이블
                     Label tokenLabel = new Label(token.getName());
+                    //HBox에 원형 모양 노드와 텍스트 레이블 추가
                     tokenBox.getChildren().addAll(circle, tokenLabel);
+                    //상태패널에 HBox 추가
                     statusPanel.getChildren().add(tokenBox);
                 }
             }
-            
+
+            //Separator : 구분선
             statusPanel.getChildren().add(new Separator());
         }
     }
