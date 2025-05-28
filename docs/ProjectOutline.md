@@ -51,9 +51,7 @@
 - 다음의 산출물은 docs 폴더에 정리하여 진행됨
 1. Requirement Process
 - `/UseCaseModel`을 참고하여 UseCaseModel(UseCaseText, UseCaseDiagram, System Sequence Diagram) 확인
-2. Analysis Process
-- `DomainModel.jpg`을 참고하여 Domain Model 확인 
-3. Architectural/Detailed Design Process
+2. Architectural/Detailed Design Process
 - `Design&CodeReport.md`를 참고하여 해당 리포트와 Interaction Diagram/Class Diagram 확인
-4. Implementation/Testing Process
+3. Implementation/Testing Process
 - `TestReport.md`를 참고하여 JUnit을 통한 리포트 확인
