@@ -1,0 +1,59 @@
+# 윷놀이 프로젝트 개요
+
+## 윷놀이 기본 사항
+- **OOAD(+MVC 아키텍처 패턴)기법** 적용
+- UIToolKit(Swing, JavaFX) 통해 **두 개 이상의 UI** 구현
+- **UI를 제외한 나머지 코드(Model, Controller) 재사용**
+- 테스트 용이한 설계를 위해 **JUnit으로 모델 테스트 수행**
+- **게임 시작 시 설정 가능 항목:**
+  - 참여자 수: 2명 ~ 4명
+  - 게임 말 갯수: 2개 ~ 5개
+- **게임 진행 환경:**
+  - 한 대의 컴퓨터로 게임 진행
+  - 개인전으로 진행
+
+## 윷놀이 게임 기능
+1. VIEW
+<img width="221" alt="image" src="https://github.com/user-attachments/assets/9b8940b3-c247-4d42-b39b-64a7939e972e" />
+
+- 윷놀이 판은 다음 그림과 같이 진행
+  - 윷놀이 판은 사각형, 오각형, 육각형까지 선택 (7각형 이상의 도형도 가능하지만 4, 5, 6각형에 최적화)
+- 각 참여자의 말 현재 위치 표시
+  - 같은 팀 두 개 이상 말이 있을 경우, 말 이름 두 개 모두 표시 (ex. Player1 - 1, 2)
+  - 분기점에 있을 경우, 어떤 방향갈지 표시
+  - 윷/모를 통해 말을 두 번 이상 움직이는 조건에서 윷 순서 표시
+- 랜덤 윷 던지기 버튼, 지정 윷 던지기 버튼 표시
+- 게임 승리 시, 승리한 팀 표시
+
+2. CONTROLLER
+- 윷놀이 판 PATH 규칙: 중심점에서 멈추는 경우에는 종료 지점과 가장 가까운 path로 진행, 그렇지 않은 경우 종료 지점과 두 번째로 가까운 path로 진행
+- 지정 윷 던지기(테스트용): 빽도, 도, 개, 걸, 윷, 모 중 선택한 결과로 진행
+- 랜덤 윷 던지기: 랜덤한 윷 결과 진행
+- 이동할 말 선택: 사용자는 윷 던지기 결과를 적용할 게임 말을 선택
+  - 같은 팀 두 말이 같은 위치에 있는 조건에서 업기 기능 추가
+  - 다른 팀 말 위치에 가는 조건에서 잡기 기능 추가
+  - 분기점에 있는 조건에서 어떤 방향으로 이동할지 기능 추가
+  - 윷/모를 통해 말을 두 번 이상 움직이는 조건에서 어떤 말에 어떤 윷을 적용할지 기능 추가
+- 먼저 모든 말을 내보내는 팀이 게임 승리
+
+3. MODEL
+- 물리적인 모습이 아닌, 실제 윷놀이 판에서의 연결 구현 (그래프)
+- 각 노드에서의 정보(다음 노드, 노드의 위치 등..) 구현
+- 각 플레이어들의 정보(이동 중인 말, 끝난 말 등..) 구현
+- 각 말들의 정보(소유자, 현재 노드, 이전 턴에 지나온 노드 - 빽도 등..) 구현
+  - 말들의 현재 상태를 표시하기 위한 enum 구현
+- 게임 규칙(잡기, 업기, 이동, 분기 등..)에 대한 구현
+
+## OOAD 기법
+- OOAD 기법은 Object-Oriented Analysis, Object-Oriented Design으로 분류됨
+- OOA는 도메인 컨셉을 찾아가는 방식, OOD는 소프트웨어 객체 정의를 통한 요구 분석 이행을 목표로 하는 방식
+- OOAD 기법의 산출물(Artifact)는 Use-Case, Domain Model, Interaction Diagram, Class Diagram이 있음
+- 다음의 산출물은 docs 폴더에 정리하여 진행됨
+1. Requirement Process
+- `/UseCaseModel`을 참고하여 UseCaseModel(UseCaseText, UseCaseDiagram, System Sequence Diagram) 확인
+2. Analysis Process
+- `DomainModel.jpg`을 참고하여 Domain Model 확인 
+3. Architectural/Detailed Design Process
+- `Design&CodeReport.md`를 참고하여 해당 리포트와 Interaction Diagram/Class Diagram 확인
+4. Implementation/Testing Process
+- `TestReport.md`를 참고하여 JUnit을 통한 리포트 확인
