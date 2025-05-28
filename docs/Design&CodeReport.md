@@ -1,29 +1,32 @@
 # 설계 및 구현 리포트 구성
 
-1. 개요 (**OOAD** Lec 6.1, Lec2)
+1. 윷놀이 판 디자인
+- 보드 쉐이프를 설정하였을 때 게임 설정으로 이동하여 보드 생성
 
-2. Requirements Elicitation
+2. 게임 설정
+- 플레이어 수와 말 갯수를 설정
+- 이때, 플레이어 수가 2명 이상이거나 4명 이하여야 함.
+- 또한, 말 갯수가 2명 이상이거나 4명 이하여야 함.
 
-   1. 기능적 요구사항 (FR)
-  
-   2. 비기능적 요구사항 (NFR)
-  
-   3. **Use Case Model** <Use Case Diagram -> Use Case Text -> System Sequence Diagram -> Operation Contracts>
+3. 말 이동
+- 윷이 여러 개일 경우, 각 윷마다 특정 말을 선택하여 움직임
 
-3. Analysis ( = Discover the Domain concepts(objects))
-   
-    1. **Domain Model** (= 객체 형태로 표현 + most important)
-  
-    2. 중요 객체 설명
+4. 말 업기
+- 말 이동 중인 경우, 말을 업을 수 있을 때 업기
 
-4. Architectural Design (Lec.17)
-   
-    1. Domain Layer
-  
-    2. MVC Architecture
-  
-    3. UI 설계 독립성
+5. 말 잡기
+- 말 이동 중인 경우, 말을 잡을 수 있을 때 잡기
+- 말을 잡은 경우, 윷을 던지기
 
-5. Detailed Design (Lec.19)
+6. 분기점 방향 선택
+- 말 이동 중인 경우, 말이 분기점에 있을 때 분기점 선택
 
-    1. Interaction Diagram
+7. 윷 던지기
+- 도, 개, 걸, 윷, 모 중 윷을 던짐
+- 윷, 모인 경우, 윷을 한 번 더 던질 수 있음
+- 윷 사이즈가 2개 이상인 경우, 윷 결과를 정렬
+
+8. 한 팀이 모든 말을 내보냈을 때 게임 종료
+- 한 팀의 말들이 모두 도착한 경우 승리 화면을 띄움
+- 재시작할 경우, 재시작
+- 끝낼 경우 끝냄
