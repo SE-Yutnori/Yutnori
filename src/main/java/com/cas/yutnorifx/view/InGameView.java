@@ -219,23 +219,6 @@ public class InGameView {
                 .orElse(GameEndChoice.EXIT);
     }
 
-    public void exitGame() {
-        System.exit(0);
-    }
-
-    public void restartGame() {
-        // JavaFX에서는 Platform.runLater를 사용하여 UI 스레드에서 실행
-        javafx.application.Platform.runLater(() -> {
-            Stage stage = (Stage) statusPanel.getScene().getWindow();
-            stage.close();
-            try {
-                new com.cas.yutnorifx.YutnoriGameFX().start(new Stage());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
     public void setOnRollYut(Runnable handler) {
         this.onRollYut = handler;
     }

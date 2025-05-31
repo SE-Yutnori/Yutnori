@@ -2,6 +2,7 @@ package com.cas.yutnorifx.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 플레이어의 정보가 담긴 클래스
@@ -54,6 +55,80 @@ public class Player {
             }
         }
         return true;
+    }
+    
+    /**
+     * 이동 가능한 토큰들을 반환 (FINISHED가 아닌 토큰들)
+     * @return 이동 가능한 토큰 리스트
+     */
+    public List<Token> getMovableTokens() {
+        return tokens.stream()
+                .filter(token -> token.getState() != TokenState.FINISHED)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 빽도로 이동 가능한 토큰들을 반환 (ACTIVE 상태인 토큰들)
+     * @return 빽도 이동 가능한 토큰 리스트
+     */
+    public List<Token> getBackwardMovableTokens() {
+        return tokens.stream()
+                .filter(token -> token.getState() == TokenState.ACTIVE)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 대기 상태인 토큰들을 반환 (READY 상태인 토큰들)
+     * @return 대기 상태 토큰 리스트
+     */
+    public List<Token> getReadyTokens() {
+        return tokens.stream()
+                .filter(token -> token.getState() == TokenState.READY)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 게임 중인 토큰들을 반환 (ACTIVE 상태인 토큰들)
+     * @return 게임 중인 토큰 리스트
+     */
+    public List<Token> getActiveTokens() {
+        return tokens.stream()
+                .filter(token -> token.getState() == TokenState.ACTIVE)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 완주한 토큰들을 반환 (FINISHED 상태인 토큰들)
+     * @return 완주한 토큰 리스트
+     */
+    public List<Token> getFinishedTokens() {
+        return tokens.stream()
+                .filter(token -> token.getState() == TokenState.FINISHED)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 특정 이름의 토큰을 찾아 반환
+     * @param tokenName 토큰 이름
+     * @return 해당 토큰 (없으면 null)
+     */
+    public Token getTokenByName(String tokenName) {
+        return tokens.stream()
+                .filter(token -> tokenName.equals(token.getName()))
+                .findFirst()
+                .orElse(null);
+    }
+    
+    /**
+     * 모든 토큰을 초기 상태로 리셋
+     */
+    public void resetAllTokens() {
+        for (Token token : tokens) {
+            if (token.getState() != TokenState.READY) {
+                token.setState(TokenState.READY);
+                token.clearStackedTokens();
+            }
+        }
     }
 }
 
