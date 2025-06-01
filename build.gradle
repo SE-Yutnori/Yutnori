@@ -1,0 +1,67 @@
+plugins {
+  id 'java'
+  id 'application'
+  id 'org.openjfx.javafxplugin' version '0.0.13'
+  id 'org.beryx.jlink' version '2.25.0'
+}
+
+group = 'com.cas'
+version = '1.0-SNAPSHOT'
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  junitVersion = '5.10.2'
+}
+
+sourceCompatibility = '23'
+targetCompatibility = '23'
+
+tasks.withType(JavaCompile) {
+  options.encoding = 'UTF-8'
+}
+
+application {
+  // 모듈 시스템 없이 일반 클래스패스 방식으로 실행
+  mainClass = 'com.cas.yutnorifx.YutnoriGameMain'
+}
+
+javafx {
+  version = '23'
+  modules = [ 'javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml' ]
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(23)
+  }
+}
+
+dependencies {
+  testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+  testImplementation "org.junit.platform:junit-platform-suite:1.10.2"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+}
+
+test {
+  useJUnitPlatform()
+}
+
+jlink {
+  imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
+  options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+  launcher {
+    name = 'app'
+  }
+}
+
+jlinkZip {
+  group = 'distribution'
+}
+
+run {
+  // System property를 JVM에 전달
+  systemProperties System.getProperties()
+}
