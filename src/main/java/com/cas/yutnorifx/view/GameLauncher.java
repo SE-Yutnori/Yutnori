@@ -1,14 +1,14 @@
 package com.cas.yutnorifx.view;
 
+import com.cas.yutnorifx.model.core.*;
 import com.cas.yutnorifx.controller.GameController;
-import com.cas.yutnorifx.model.Board;
-import com.cas.yutnorifx.model.Player;
-import com.cas.yutnorifx.model.YutGameRules;
-import com.cas.yutnorifx.model.GameState;
 
+//javafx 관련 클래스
 import javafx.scene.control.*;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+//java 관련 클래스
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -72,10 +72,31 @@ public class GameLauncher {
             InGameView inGameView = new InGameView(gameState.getBoard().getNodes(), gameState.getPlayers());
 
             // 게임 컨트롤러 생성
-            GameController controller = new GameController(gameState, inGameView);
+            GameController controller = new GameController(gameState);
+            
+            // Observer 패턴 연결: View가 Model의 이벤트를 자동으로 받도록 설정
+            gameState.addObserver(inGameView);
             
             // Controller와 View 연결
             inGameView.setOnRollYut(() -> controller.rollingYut());
+            
+            // 게임 종료 이벤트를 Controller로 전달
+            inGameView.setOnGameEnd(choice -> controller.handleGameEndChoice(choice));
+            
+            // 분기 선택 이벤트를 Controller로 전달
+            inGameView.setOnBranchSelection(response -> controller.handleBranchSelection(response));
+            
+            // 토큰 선택 이벤트를 Controller로 전달
+            inGameView.setOnTokenSelection(response -> controller.handleTokenSelection(response));
+            
+            // 테스트 윷 선택 이벤트를 Controller로 전달
+            inGameView.setOnYutTestSelection(response -> controller.handleYutTestSelection(response));
+            
+            // 메시지 확인 완료 이벤트를 Controller로 전달
+            inGameView.setOnMessageConfirmed(() -> controller.handleMessageConfirmed());
+            
+            // 재배열 선택 이벤트를 Controller로 전달
+            inGameView.setOnReorderSelection(response -> controller.handleReorderSelection(response));
             
             // Application 레벨 콜백 설정
             controller.setOnGameRestart(() -> restartApplication());

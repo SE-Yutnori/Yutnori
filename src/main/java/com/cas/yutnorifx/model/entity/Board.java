@@ -1,4 +1,4 @@
-package com.cas.yutnorifx.model;
+package com.cas.yutnorifx.model.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,8 @@ public class Board {
         createCenterPathNodes(edgeNodes, center, toCenterPath1, toCenterPath2, centerX, centerY);
         connectNodes(edgeNodes, center, toCenterPath1, toCenterPath2);
         
-        this.startNode = findNodeByName("Edge0-0");
+        // 동적으로 첫 번째 모서리 노드를 시작 노드로 설정
+        this.startNode = edgeNodes[0][0];
     }
     
     private void createEdgeNodes(BoardNode[][] edgeNodes, float centerX, float centerY) {
@@ -134,6 +135,23 @@ public class Board {
                 .filter(node -> nodeName.equals(node.getName()))
                 .findFirst()
                 .orElse(null);
+    }
+    
+    /**
+     * 현재 노드의 이전 노드를 찾는 메서드
+     * @param currentNode 현재 노드
+     * @return 이전 노드 (없으면 null)
+     */
+    public BoardNode findPreviousNode(BoardNode currentNode) {
+        if (currentNode == null) return null;
+        
+        // 모든 노드를 순회하면서 currentNode를 nextNode로 가지는 노드 찾기
+        for (BoardNode node : nodes) {
+            if (node.getNextNodes().contains(currentNode)) {
+                return node;
+            }
+        }
+        return null; // 이전 노드가 없음 (시작 노드인 경우)
     }
     
     public int getSides() {
