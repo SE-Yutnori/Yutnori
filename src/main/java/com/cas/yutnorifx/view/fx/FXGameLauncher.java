@@ -1,9 +1,7 @@
 package com.cas.yutnorifx.view.fx;
 
 import com.cas.yutnorifx.model.core.*;
-import com.cas.yutnorifx.model.entity.*;
 import com.cas.yutnorifx.controller.GameController;
-import com.cas.yutnorifx.view.GameEndChoice;
 
 //javafx 관련 클래스
 import javafx.scene.control.*;
@@ -115,10 +113,10 @@ public class FXGameLauncher {
         });
     }
 
-    // ✅ 현재 Stage 관리
+    // 현재 Stage 관리
     private Stage currentStage;
 
-    // ✅ Application 재시작 처리
+    // Application 재시작 처리
     private void restartApplication() {
         if (currentStage != null) {
             currentStage.close();
@@ -126,7 +124,7 @@ public class FXGameLauncher {
         start(); // 새 게임 시작
     }
 
-    // ✅ Application 종료 처리
+    // Application 종료 처리
     private void exitApplication() {
         System.exit(0);
     }

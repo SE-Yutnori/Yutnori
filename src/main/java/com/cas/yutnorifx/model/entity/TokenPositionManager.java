@@ -48,28 +48,6 @@ public class TokenPositionManager {
     }
 
     /**
-     * 특정 노드의 토큰들 반환
-     */
-    public List<Token> getTokensOnNode(String nodeName) {
-        BoardNode node = board.findNodeByName(nodeName);
-        if (node != null) {
-            return new ArrayList<>(node.getTokens());
-        }
-        return new ArrayList<>();
-    }
-
-    /**
-     * 보드 위의 모든 토큰 반환
-     */
-    public List<Token> getAllTokensOnBoard() {
-        List<Token> allTokens = new ArrayList<>();
-        for (BoardNode node : board.getNodes()) {
-            allTokens.addAll(node.getTokens());
-        }
-        return allTokens;
-    }
-
-    /**
      * 보드 객체 반환
      */
     public Board getBoard() {

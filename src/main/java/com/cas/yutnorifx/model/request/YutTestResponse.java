@@ -1,8 +1,6 @@
 package com.cas.yutnorifx.model.request;
 
-/**
- * 테스트 모드 윷 선택 응답 정보를 담는 클래스
- */
+//테스트 모드 윷 선택 응답 정보를 담는 클래스
 public class YutTestResponse {
     private final String requestId;
     private final int selectedYutResult;

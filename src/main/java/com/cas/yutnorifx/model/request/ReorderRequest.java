@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 윷 결과 재배열 요청 정보를 담는 클래스
- */
+//윷 결과 재배열 요청 정보를 담는 클래스
 public class ReorderRequest {
     private final List<Integer> originalResults;
     private final String playerName;
@@ -20,10 +18,6 @@ public class ReorderRequest {
     
     public List<Integer> getOriginalResults() { 
         return new ArrayList<>(originalResults); 
-    }
-    
-    public String getPlayerName() { 
-        return playerName; 
     }
     
     public String getRequestId() { 

@@ -11,30 +11,27 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-/**
- * 게임의 전반적인 상태를 관리하는 클래스
- */
+//게임의 전반적인 상태를 관리하는 클래스
 public class GameState {
     private final List<Player> players;
     private final TokenPositionManager tokenPositionManager;
     private final Board board;
     private Player currentPlayer;
     private GamePhase phase;
-    private Player winner;
-    
+
     // Observer 패턴 추가
     private final GameEventNotifier eventNotifier;
     
-    // 분기 선택 관리 (비동기 처리용)
+    // 분기 선택 관리
     private final Map<String, CompletableFuture<BranchSelectionResponse>> pendingBranchSelections = new ConcurrentHashMap<>();
     
-    // 토큰 선택 관리 (비동기 처리용)
+    // 토큰 선택 관리
     private final Map<String, CompletableFuture<TokenSelectionResponse>> pendingTokenSelections = new ConcurrentHashMap<>();
     
-    // 테스트 윷 선택 관리 (비동기 처리용)
+    // 테스트 윷 선택 관리
     private final Map<String, CompletableFuture<YutTestResponse>> pendingYutTestSelections = new ConcurrentHashMap<>();
     
-    // 재배열 선택 관리 (비동기 처리용)
+    // 재배열 선택 관리
     private final Map<String, CompletableFuture<ReorderResponse>> pendingReorderSelections = new ConcurrentHashMap<>();
     
     private int branchRequestCounter = 0;
@@ -50,19 +47,6 @@ public class GameState {
     
     // 추가 턴 관리 (boolean으로 간단하게)
     private boolean hasAdditionalTurn = false;
-    
-    public GameState(List<Player> players, TokenPositionManager tokenPositionManager, Board board) {
-        this.players = new ArrayList<>(players);
-        this.tokenPositionManager = tokenPositionManager;
-        this.board = board;
-        this.phase = GamePhase.NOT_STARTED;
-        this.winner = null;
-        this.eventNotifier = new GameEventNotifier();
-        
-        if (!players.isEmpty()) {
-            this.currentPlayer = players.get(0);
-        }
-    }
 
     // 게임 초기화를 위한 생성자
     public GameState(int sides, float radius, List<String> playerNames, List<Integer> tokenCounts) {
@@ -70,7 +54,6 @@ public class GameState {
         this.tokenPositionManager = new TokenPositionManager(board);
         this.players = new ArrayList<>();
         this.phase = GamePhase.NOT_STARTED;
-        this.winner = null;
         this.eventNotifier = new GameEventNotifier();
 
         // 플레이어 생성
@@ -89,11 +72,7 @@ public class GameState {
     public void addObserver(GameEventObserver observer) {
         eventNotifier.addObserver(observer);
     }
-    
-    public void removeObserver(GameEventObserver observer) {
-        eventNotifier.removeObserver(observer);
-    }
-    
+
     // 분기 선택 응답 처리
     public void handleBranchSelection(BranchSelectionResponse response) {
         CompletableFuture<BranchSelectionResponse> future = pendingBranchSelections.get(response.getRequestId());
@@ -178,13 +157,6 @@ public class GameState {
         } else {
             String[] yutNames = {"도", "개", "걸", "윷", "모"};
             return yutNames[Math.min(steps - 1, yutNames.length - 1)];
-        }
-    }
-    
-    public void startGame() {
-        if (phase == GamePhase.NOT_STARTED) {
-            phase = GamePhase.IN_PROGRESS;
-            currentPlayer = players.get(0);
         }
     }
 
@@ -303,8 +275,7 @@ public class GameState {
     public boolean checkVictory(Player player) {
         if (player.hasFinished()) {
             phase = GamePhase.FINISHED;
-            winner = player;
-            
+
             // 게임 종료 이벤트 통지
             eventNotifier.notifyEvent(GameEvent.Type.GAME_ENDED, player, 
                 player.getName() + "님이 승리했습니다!");
@@ -313,33 +284,12 @@ public class GameState {
         return false;
     }
 
-    public boolean isGameEnded() {
-        return phase == GamePhase.FINISHED;
-    }
-    
-    // Getters
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
-    
-    public GamePhase getPhase() {
-        return phase;
-    }
-    
-    public TokenPositionManager getTokenPositionManager() {
-        return tokenPositionManager;
-    }
-
     public Board getBoard() {
         return board;
     }
 
     public List<Player> getPlayers() {
         return new ArrayList<>(players);
-    }
-
-    public Player getWinner() {
-        return winner;
     }
 
     // 한 번의 이동 처리 (Observer 패턴)

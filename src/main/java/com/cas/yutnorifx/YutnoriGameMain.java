@@ -24,12 +24,12 @@ public class YutnoriGameMain extends Application {
         
         if ("swing".equals(uiType)) {
             // Swing 직접 실행
-            System.out.println("Swing 모드로 실행합니다...");
+            System.out.println("Swing mode...");
             SwingUtilities.invokeLater(() -> new SwingGameLauncher().start());
         } else {
             // 기본값: JavaFX 실행 (fx 또는 아무것도 지정 안함)
-            System.out.println("JavaFX 모드로 실행합니다...");
-            System.out.println("다른 UI를 원하면: ./gradlew run -Dui=swing");
+            System.out.println("JavaFX mode...");
+            System.out.println("if you want other UI then -> ./gradlew run -Dui=swing");
             launch(args);
         }
     }

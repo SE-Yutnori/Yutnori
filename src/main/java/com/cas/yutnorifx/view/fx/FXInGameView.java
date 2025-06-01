@@ -507,15 +507,6 @@ public class FXInGameView implements GameEventObserver {
             callback.run();
         }
     }
-    
-    // 메시지 표시 완료 후 실행할 콜백 등록
-    public void executeAfterMessages(Runnable callback) {
-        pendingCallbacks.offer(callback);
-        // 현재 메시지가 없으면 즉시 실행
-        if (messageQueue.isEmpty() && !isShowingMessage) {
-            processPendingCallbacks();
-        }
-    }
 
     // 재배열 요청 다이얼로그
     public List<Integer> requestReorder(ReorderRequest request) {

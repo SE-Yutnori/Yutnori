@@ -6,12 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 import java.util.function.Function;
 
-/**
- * 윷 던지기 로직을 처리하는 클래스
- */
+//윷 던지기 로직을 처리하는 클래스
 public class YutGameRules {
     private static boolean testMode = false;
 
@@ -19,9 +16,7 @@ public class YutGameRules {
         testMode = mode;
     }
 
-    /**
-     * 윷 던지기 결과를 담는 클래스
-     */
+    //윷 던지기 결과를 담는 클래스
     public static class YutThrowResult {
         private final List<Integer> results;
         private final List<String> resultMessages;
@@ -35,9 +30,7 @@ public class YutGameRules {
         public List<String> getResultMessages() { return new ArrayList<>(resultMessages); }
     }
 
-    /**
-     * 이동 결과를 담는 클래스
-     */
+    //이동 결과를 담는 클래스
     public static class MoveResult {
         private final boolean success;
         private final boolean catched;
@@ -57,32 +50,7 @@ public class YutGameRules {
         public String getMessage() { return message; }
     }
 
-    /**
-     * 순서 재배열 요청을 담는 클래스
-     */
-    public static class ReorderRequest {
-        private final List<Integer> originalResults;
-        private final String playerName;
-        
-        public ReorderRequest(List<Integer> originalResults, String playerName) {
-            this.originalResults = new ArrayList<>(originalResults);
-            this.playerName = playerName;
-        }
-        
-        public List<Integer> getOriginalResults() { return new ArrayList<>(originalResults); }
-        public String getPlayerName() { return playerName; }
-        public String getPromptMessage() {
-            String originalStr = originalResults.stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining(","));
-            return playerName + "님의 윷 결과: [" + originalStr + "]\n" +
-                   "원하는 말 이동 순서 (예: 5,4,5,3)";
-        }
-    }
-
-    /**
-     * 순서 재배열 결과를 담는 클래스
-     */
+    //순서 재배열 결과를 담는 클래스
     public static class ReorderResult {
         private final boolean success;
         private final List<Integer> reorderedResults;
@@ -109,9 +77,7 @@ public class YutGameRules {
         public String getErrorMessage() { return errorMessage; }
     }
 
-    /**
-     * 윷 결과 누적
-     */
+    //윷 결과 누적
     public static YutThrowResult accumulateYut(Player currentPlayer) {
         List<Integer> results = new ArrayList<>();
         List<String> messages = new ArrayList<>();
@@ -138,9 +104,7 @@ public class YutGameRules {
         return new YutThrowResult(results, messages);
     }
 
-    /**
-     * 기본 윷 던지기
-     */
+    //기본 윷 던지기
     public static int throwOneYut() {
         if (testMode) {
             return 1;
@@ -171,9 +135,7 @@ public class YutGameRules {
         }
     }
 
-    /**
-     * 순서 재배열 검증
-     */
+    //순서 재배열 검증
     public static ReorderResult validateReorderInput(String input, List<Integer> originalResults) {
         if (input == null || input.trim().isEmpty()) {
             return ReorderResult.error("입력이 비어있습니다.");
@@ -212,6 +174,8 @@ public class YutGameRules {
     public static boolean isTestMode() {
         return testMode;
     }
+
+    //토큰은 총 전진, 후진, 분기 선택 - 세 가지의 움직임이 존재
 
     // Token 이동 관련 메서드들
     public static MoveResult moveToken(Token token, int steps, TokenPositionManager tokenManager, Function<List<BoardNode>, BoardNode> branchSelector) {
@@ -286,6 +250,7 @@ public class YutGameRules {
         return new MoveResult(true, caught, false, "");
     }
 
+    //분기 노드에 대해서
     private static BoardNode calculateTargetNode(Token token, int steps, int originalSteps, TokenPositionManager tokenManager, Function<List<BoardNode>, BoardNode> branchSelector) {
         BoardNode current = tokenManager.getTokenPosition(token);
         BoardNode previous = current; // 이전 노드 추적용
@@ -399,7 +364,7 @@ public class YutGameRules {
         return current;
     }
 
-    // Center에서 보드 타입에 따른 기본 경로 계산
+    // 분기 중 센터에 대해서 Center에서 보드 타입에 따른 기본 경로 계산
     private static BoardNode calculateCenterDefaultPath(Token token, List<BoardNode> nextNodes, TokenPositionManager tokenManager) {
         BoardNode previousNode = token.getPreviousNode();
         if (previousNode == null || nextNodes.isEmpty()) {

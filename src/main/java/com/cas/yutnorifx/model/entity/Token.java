@@ -57,17 +57,8 @@ public class Token {
         }
     }
 
-    public void removeStackedToken(Token token) {
-        stackedTokens.remove(token);
-    }
-
     public void clearStackedTokens() {
         stackedTokens.clear();
-    }
-
-    // 다음 분기 선택 설정/해제
-    public void setNextBranchChoice(BoardNode branchChoice) {
-        this.nextBranchChoice = branchChoice;
     }
 
     public void clearNextBranchChoice() {
@@ -77,10 +68,6 @@ public class Token {
     // 이전 노드 설정/해제
     public void setPreviousNode(BoardNode previousNode) {
         this.previousNode = previousNode;
-    }
-
-    public void clearPreviousNode() {
-        this.previousNode = null;
     }
 
     // 업힌 토큰들이 다 대표 토큰이 될 수 있게..

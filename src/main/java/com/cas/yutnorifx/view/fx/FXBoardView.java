@@ -27,10 +27,10 @@ public class FXBoardView extends Pane {
     private final BoardNode startNode;
 
     // 기본 크기 (스케일링 기준) - 더 컴팩트하게 조정
-    private static final double BASE_SPACING = 120.0;  // 180 → 120으로 축소
+    private static final double BASE_SPACING = 180.0;  // 180 → 120으로 축소
     private static final double BASE_OFFSET = 20.0;    // 10 → 20으로 여백 증가
-    private static final double BASE_WIDTH = BASE_SPACING * 6;   // 8 → 6으로 폭 축소
-    private static final double BASE_HEIGHT = BASE_SPACING * 4;  // 5 → 4로 높이 축소
+    private static final double BASE_WIDTH = BASE_SPACING * 8;   // 8 → 6으로 폭 축소
+    private static final double BASE_HEIGHT = BASE_SPACING * 5;  // 5 → 4로 높이 축소
 
     public FXBoardView(List<BoardNode> nodes, List<Player> players) {
         this.nodes = nodes;

@@ -153,12 +153,4 @@ public class Board {
         }
         return null; // 이전 노드가 없음 (시작 노드인 경우)
     }
-    
-    public int getSides() {
-        return sides;
-    }
-    
-    public float getRadius() {
-        return radius;
-    }
 } 
