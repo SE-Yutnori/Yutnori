@@ -58,7 +58,7 @@ public class GameState {
     }
 
     public YutGameRules.YutThrowResult throwYut() {
-        return YutGameRules.accumulateYut(currentPlayer);
+        return YutGameRules.throwYut();
     }
     
     public void nextTurn() {
@@ -92,9 +92,15 @@ public class GameState {
         if (currentPlayer == null) return new ArrayList<>();
         
         if (steps < 0) {
-            return currentPlayer.getBackwardMovableTokens();
+            // 빽도는 ACTIVE 상태인 토큰들만 (업힌 토큰들도 포함)
+            return currentPlayer.getTokens().stream()
+                    .filter(token -> token.getState() == TokenState.ACTIVE)
+                    .collect(java.util.stream.Collectors.toList());
         } else {
-            return currentPlayer.getMovableTokens();
+            // 일반 이동은 FINISHED가 아닌 모든 토큰들 (READY, ACTIVE 모두 포함)
+            return currentPlayer.getTokens().stream()
+                    .filter(token -> token.getState() != TokenState.FINISHED)
+                    .collect(java.util.stream.Collectors.toList());
         }
     }
 
@@ -103,16 +109,19 @@ public class GameState {
             return new YutGameRules.MoveResult(false, false, false, "게임이 종료되었습니다.");
         }
 
+        // 실제 이동할 대표 토큰 찾기
+        Token actualToken = token.getTopMostToken();
+
         if (steps < 0) {
-            if (token.getState() != TokenState.ACTIVE) {
+            if (actualToken.getState() != TokenState.ACTIVE) {
                 return new YutGameRules.MoveResult(false, false, false, "대기 중인 말은 빽도로 이동할 수 없습니다.");
             }
-            return YutGameRules.moveTokenBackward(token, Math.abs(steps), tokenPositionManager);
+            return YutGameRules.moveTokenBackward(actualToken, Math.abs(steps), tokenPositionManager);
         } else {
-            if (token.getState() == TokenState.READY) {
-                tokenPositionManager.placeTokenAtStart(token);
+            if (actualToken.getState() == TokenState.READY) {
+                tokenPositionManager.placeTokenAtStart(actualToken);
             }
-            return YutGameRules.moveToken(token, steps, tokenPositionManager, branchSelector);
+            return YutGameRules.moveToken(actualToken, steps, tokenPositionManager, branchSelector);
         }
     }
     

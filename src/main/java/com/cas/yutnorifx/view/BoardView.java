@@ -21,6 +21,9 @@ public class BoardView extends Pane {
     private final Color[] playerColors = {
             Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA
     };
+    
+    // 첫 번째 노드 (시작 노드) 참조
+    private final BoardNode startNode;
 
     private static final int SPACING = 180;
     private static final int OFFSET = 10;
@@ -31,6 +34,13 @@ public class BoardView extends Pane {
         this.canvas = new Canvas(SPACING * 8, SPACING * 5);
         this.gc = canvas.getGraphicsContext2D();
         getChildren().add(canvas);
+        
+        // 시작 노드 찾기 (첫 번째 모서리 노드)
+        this.startNode = nodes.stream()
+                .filter(node -> node.getName().matches("Edge\\d+-0"))
+                .findFirst()
+                .orElse(null);
+        
         refresh();
     }
 
@@ -46,7 +56,8 @@ public class BoardView extends Pane {
             int x1 = (int) (node.getX() * SPACING + OFFSET);
             int y1 = (int) (node.getY() * SPACING + OFFSET);
 
-            if (size >= 2 || node.getName().equals("Edge0-0")) {
+            // 분기점이거나 시작 노드인 경우 특별한 화살표 그리기
+            if (size >= 2 || node.equals(startNode)) {
                 for (int k = 1; k < size - 1; k++) {
                     BoardNode mid = nextNodes.get(k);
                     int mx = (int) (mid.getX() * SPACING + OFFSET);
@@ -101,7 +112,12 @@ public class BoardView extends Pane {
 
             int out = 56;
             int radius = 36;
-            if (name.equals("Center") || name.matches("Edge\\d+-5") || name.matches("Edge\\d+-0")) {
+            // 중요한 노드들 (Center, 모서리 시작점, 모서리 끝점)은 특별한 원으로 표시
+            boolean isImportantNode = name.equals("Center") || 
+                                    name.matches("Edge\\d+-0") || 
+                                    name.matches("Edge\\d+-5"); // 현재는 6개 노드(0~5)로 고정되어 있음
+            
+            if (isImportantNode) {
                 int outX = x - out / 2;
                 int outY = y - out / 2;
                 gc.setFill(Color.WHITE);
@@ -125,13 +141,21 @@ public class BoardView extends Pane {
                 gc.strokeOval(drawX, drawY, radius, radius);
             }
 
-            if (name.equals("Edge0-0")) {
+            // 시작 노드 표시 (동적으로 찾은 시작 노드)
+            if (node.equals(startNode)) {
                 gc.setFont(Font.font("Arial", FontWeight.BOLD, 16));
                 gc.setFill(Color.RED);
                 int textX = x - 15;
                 int textY = y - out/2;
                 gc.fillText("start", textX, textY);
             }
+            
+            // 모든 노드의 이름 표시
+            gc.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+            gc.setFill(Color.BLUE);
+            int nameX = x - name.length() * 3; // 텍스트 중앙 정렬 근사치
+            int nameY = y + (isImportantNode ? out/2 + 15 : radius/2 + 15);
+            gc.fillText(name, nameX, nameY);
         }
 
         // 말 표시
@@ -156,12 +180,23 @@ public class BoardView extends Pane {
             gc.setStroke(Color.BLACK);
             gc.strokeOval(cx, cy, 20, 20);
 
+            // 대표 토큰과 업힌 토큰들의 이름을 모두 표시
             String baseName = top.getName().split("-")[0];
-            List<String> indices = activeTokens.stream()
-                    .map(t -> t.getName().split("-")[1])
-                    .toList();
+            List<String> allIndices = new java.util.ArrayList<>();
+            
+            // 노드에 실제로 있는 토큰들의 인덱스 추가
+            for (Token t : activeTokens) {
+                allIndices.add(t.getName().split("-")[1]);
+            }
+            
+            // 업힌 토큰들의 인덱스도 추가
+            for (Token t : activeTokens) {
+                for (Token stacked : t.getStackedTokens()) {
+                    allIndices.add(stacked.getName().split("-")[1]);
+                }
+            }
 
-            String label = baseName + " - " + String.join(",", indices);
+            String label = baseName + " - " + String.join(",", allIndices);
 
             gc.setFont(Font.font("Arial", FontWeight.BOLD, 15));
             gc.fillText(label, cx - 5, cy - 5);

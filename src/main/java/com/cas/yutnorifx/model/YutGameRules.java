@@ -212,8 +212,8 @@ public class YutGameRules {
         return testMode;
     }
 
-    // 윷 던지기 결과 생성
-    public static YutThrowResult throwYut() {
+    // 단일 윷 던지기 (연속 던지기 없음)
+    public static YutThrowResult throwSingleYut() {
         List<Integer> results = new ArrayList<>();
         List<String> messages = new ArrayList<>();
         
@@ -223,21 +223,35 @@ public class YutGameRules {
         String yutName = getYutName(result);
         messages.add(yutName + " (" + result + "칸)");
         
-        // 윷이나 모가 나오면 한 번 더
-        if (result >= 4) {
-            int additionalResult = getYutResult();
-            results.add(additionalResult);
+        return new YutThrowResult(results, messages);
+    }
+
+    // 윷 던지기 결과 생성
+    public static YutThrowResult throwYut() {
+        List<Integer> results = new ArrayList<>();
+        List<String> messages = new ArrayList<>();
+        
+        int throwCount = 0;
+        boolean continueThrow = true;
+        
+        while (continueThrow) {
+            int result = getYutResult();
+            results.add(result);
             
-            String additionalYutName = getYutName(additionalResult);
-            messages.add("한번 더! " + additionalYutName + " (" + additionalResult + "칸)");
+            String yutName = getYutName(result);
+            String message;
+            if (throwCount == 0) {
+                message = yutName + " (" + result + "칸)";
+            } else {
+                message = "한번 더! " + yutName + " (" + result + "칸)";
+            }
+            messages.add(message);
             
-            // 또 윷이나 모가 나오면 한 번 더
-            if (additionalResult >= 4) {
-                int finalResult = getYutResult();
-                results.add(finalResult);
-                
-                String finalYutName = getYutName(finalResult);
-                messages.add("또 한번 더! " + finalYutName + " (" + finalResult + "칸)");
+            throwCount++;
+            
+            // 윷이나 모가 아니면 종료
+            if (result < 4) {
+                continueThrow = false;
             }
         }
         
@@ -283,77 +297,220 @@ public class YutGameRules {
 
     // Token 이동 관련 메서드들
     public static MoveResult moveToken(Token token, int steps, TokenPositionManager tokenManager, Function<List<BoardNode>, BoardNode> branchSelector) {
-        if (token.getState() != TokenState.ACTIVE) {
+        // 실제 이동할 대표 토큰 찾기 (업힌 토큰이라면 그를 업고 있는 대표 토큰)
+        Token actualToken = token.getTopMostToken();
+        
+        if (actualToken.getState() != TokenState.ACTIVE) {
             return new MoveResult(false, false, false, "토큰이 활성 상태가 아닙니다.");
         }
 
-        // 현재 노드에서 나오기
-        BoardNode currentNode = tokenManager.getTokenPosition(token);
-        if (currentNode != null) {
-            currentNode.leave(token);
-        }
-
-        // 이동 처리
-        BoardNode targetNode = calculateTargetNode(token, steps, tokenManager, branchSelector);
+        // 이동 처리 먼저 확인
+        BoardNode currentNode = tokenManager.getTokenPosition(actualToken);
+        BoardNode targetNode = calculateTargetNode(actualToken, steps, steps, tokenManager, branchSelector);
+        
         if (targetNode == null) {
-            finishToken(token, tokenManager);
+            // 완주 처리 - finishToken이 노드에서 제거도 함께 처리
+            finishToken(actualToken, tokenManager);
             return new MoveResult(true, false, true, "말이 완주했습니다!");
         }
 
-        // 새 노드에 진입
-        targetNode.enter(token);
-        tokenManager.updateTokenPosition(token, targetNode);
+        // 업힌 토큰들 가져오기 (미리 복사)
+        List<Token> stackedTokens = new ArrayList<>(actualToken.getStackedTokens());
 
-        // 잡기 및 업기 처리
-        boolean caught = handleCaptureAndStacking(token, targetNode, tokenManager);
+        // 대표 토큰 이동
+        if (currentNode != null) {
+            currentNode.leave(actualToken);
+        }
+        targetNode.enter(actualToken);
+        tokenManager.updateTokenPosition(actualToken, targetNode);
+
+        // 업힌 토큰들 위치 업데이트 (노드에는 진입시키지 않음)
+        for (Token stackedToken : stackedTokens) {
+            tokenManager.updateTokenPosition(stackedToken, targetNode);
+        }
+
+        // 잡기 및 업기 처리 (대표 토큰으로만 처리)
+        boolean caught = handleCaptureAndStacking(actualToken, targetNode, tokenManager);
 
         return new MoveResult(true, caught, false, caught ? "상대방 말을 잡았습니다!" : "");
     }
 
     public static MoveResult moveTokenBackward(Token token, int steps, TokenPositionManager tokenManager) {
-        if (token.getState() != TokenState.ACTIVE) {
+        // 실제 이동할 대표 토큰 찾기 (업힌 토큰이라면 그를 업고 있는 대표 토큰)
+        Token actualToken = token.getTopMostToken();
+        
+        if (actualToken.getState() != TokenState.ACTIVE) {
             return new MoveResult(false, false, false, "토큰이 활성 상태가 아닙니다.");
         }
 
-        // 현재 노드에서 나오기
-        BoardNode currentNode = tokenManager.getTokenPosition(token);
-        if (currentNode != null) {
-            currentNode.leave(token);
+        // 업힌 토큰들 가져오기 (미리 복사)
+        List<Token> stackedTokens = new ArrayList<>(actualToken.getStackedTokens());
+
+        // 현재 위치에서 steps 만큼 뒤로 이동
+        BoardNode currentNode = tokenManager.getTokenPosition(actualToken);
+        if (currentNode == null) {
+            return new MoveResult(false, false, false, "토큰의 현재 위치를 찾을 수 없습니다.");
         }
 
-        // 뒤로 이동 (임시로 첫 노드로 이동)
-        BoardNode startNode = tokenManager.getBoard().getStartNode();
-        if (startNode == null) {
-            return new MoveResult(false, false, false, "이동할 수 없습니다.");
+        // 대표 토큰을 현재 노드에서 제거
+        currentNode.leave(actualToken);
+
+        // steps 만큼 뒤로 이동
+        BoardNode targetNode = currentNode;
+        for (int i = 0; i < steps && targetNode != null; i++) {
+            BoardNode previousNode = tokenManager.getBoard().findPreviousNode(targetNode);
+            if (previousNode != null) {
+                targetNode = previousNode;
+            } else {
+                // 더 이상 뒤로 갈 수 없으면 시작 노드로
+                targetNode = tokenManager.getBoard().getStartNode();
+                break;
+            }
         }
 
-        startNode.enter(token);
-        tokenManager.updateTokenPosition(token, startNode);
+        if (targetNode == null) {
+            targetNode = tokenManager.getBoard().getStartNode();
+        }
 
-        // 잡기 및 업기 처리
-        boolean caught = handleCaptureAndStacking(token, startNode, tokenManager);
+        // 대표 토큰을 새 노드에 진입
+        targetNode.enter(actualToken);
+        tokenManager.updateTokenPosition(actualToken, targetNode);
+
+        // 업힌 토큰들 위치 업데이트 (노드에는 진입시키지 않음)
+        for (Token stackedToken : stackedTokens) {
+            tokenManager.updateTokenPosition(stackedToken, targetNode);
+        }
+
+        // 잡기 및 업기 처리 (대표 토큰으로만 처리)
+        boolean caught = handleCaptureAndStacking(actualToken, targetNode, tokenManager);
 
         return new MoveResult(true, caught, false, caught ? "상대방 말을 잡았습니다!" : "");
     }
 
-    private static BoardNode calculateTargetNode(Token token, int steps, TokenPositionManager tokenManager, Function<List<BoardNode>, BoardNode> branchSelector) {
+    private static BoardNode calculateTargetNode(Token token, int steps, int originalSteps, TokenPositionManager tokenManager, Function<List<BoardNode>, BoardNode> branchSelector) {
         BoardNode current = tokenManager.getTokenPosition(token);
+        BoardNode previous = current; // 이전 노드 추적용
+        
         while (steps > 0 && current != null) {
             List<BoardNode> nextNodes = current.getNextNodes();
             if (nextNodes.isEmpty()) {
                 return null; // 완주
             }
-            current = nextNodes.size() > 1 ? branchSelector.apply(nextNodes) : nextNodes.get(0);
+            
+            if (nextNodes.size() > 1) {
+                // 분기점으로 이동하는 경우
+                // 모든 분기 선택은 GameController에서 처리하므로 여기서는 저장된 선택이나 기본 경로 사용
+                BoardNode preSelectedPath = token.getNextBranchChoice();
+                if (preSelectedPath != null && nextNodes.contains(preSelectedPath)) {
+                    // 이전에 선택한 경로로 이동
+                    previous = current; // 일반적인 경우만 이전 노드 업데이트
+                    current = preSelectedPath;
+                    token.clearNextBranchChoice(); // 사용 후 제거
+                } else {
+                    // 분기점 특성에 따라 기본 경로 결정
+                    // 현재 노드가 Center인지 확인
+                    if (current.getName().equals("Center")) {
+                        // Center에서 나가는 분기점: 보드 타입에 따라 기본 경로 결정
+                        // Center일 때는 이전 노드를 업데이트하지 않고 기존 previousNode 사용
+                        BoardNode defaultPath = calculateCenterDefaultPath(token, nextNodes, tokenManager);
+                        if (defaultPath != null) {
+                            current = defaultPath;
+                        } else {
+                            // 기본 경로를 찾을 수 없으면 첫 번째 옵션
+                            current = nextNodes.get(0);
+                        }
+                    } else {
+                        // 모서리 분기점: 항상 첫 번째 옵션(외곽 경로) 선택
+                        previous = current; // 일반적인 경우만 이전 노드 업데이트
+                        current = nextNodes.get(0);
+                    }
+                }
+            } else {
+                // 일반 노드로 이동
+                // Center로 이동하는 경우 미리 previousNode 설정
+                if (nextNodes.get(0).getName().equals("Center")) {
+                    token.setPreviousNode(current);
+                }
+                previous = current; // 이전 노드 업데이트
+                current = nextNodes.get(0);
+            }
+            
+            // Center가 아닌 경우에만 도착한 노드에 이전 노드 정보 설정
+            if (!current.getName().equals("Center")) {
+                token.setPreviousNode(previous);
+            }
+            
             steps--;
         }
+        
         return current;
+    }
+
+    // Center에서 보드 타입에 따른 기본 경로 계산
+    private static BoardNode calculateCenterDefaultPath(Token token, List<BoardNode> nextNodes, TokenPositionManager tokenManager) {
+        BoardNode previousNode = token.getPreviousNode();
+        if (previousNode == null || nextNodes.isEmpty()) {
+            return nextNodes.get(0);
+        }
+        
+        int sides = nextNodes.get(0).getBoardSize();
+        
+        if (sides == 4) {
+            // 4각형: 이전 노드 방향을 고려해서 직진 방향 선택
+            // 보드 구조: ToCenter1-2(오른쪽), ToCenter2-2(아래) → Center → ToCenter0-2(위), ToCenter3-2(왼쪽)
+            String previousName = previousNode.getName();
+            
+            if (previousName.startsWith("ToCenter") && previousName.endsWith("-2")) {
+                try {
+                    // 이전 노드에서 인덱스 추출 (ToCenter{index}-2)
+                    String indexStr = previousName.substring(8, previousName.length() - 2);
+                    int fromIndex = Integer.parseInt(indexStr);
+                    
+                    // 직진 매핑:
+                    // ToCenter1-2 (오른쪽에서 들어옴) → ToCenter3-2 (왼쪽으로 나감)
+                    // ToCenter2-2 (아래에서 들어옴) → ToCenter0-2 (위로 나감)
+                    int toIndex = (fromIndex + 2) % 4;
+                    String targetName = "ToCenter" + toIndex + "-2";
+                    
+                    // nextNodes에서 직진 경로 찾기
+                    for (BoardNode node : nextNodes) {
+                        if (node.getName().equals(targetName)) {
+                            // 디버깅 정보
+                            System.out.println("[DEBUG] 4각형 직진: " + previousName + " → " + targetName);
+                            return node;
+                        }
+                    }
+                    
+                    // 직진 경로를 찾지 못한 경우 (이론적으로 발생하지 않아야 함)
+                    System.out.println("[WARNING] 4각형에서 직진 경로를 찾지 못함: " + previousName + " → " + targetName);
+                    
+                } catch (NumberFormatException e) {
+                    System.out.println("[ERROR] 이전 노드 인덱스 파싱 실패: " + previousName);
+                }
+            } else {
+                System.out.println("[WARNING] 예상하지 못한 이전 노드 형식: " + previousName);
+            }
+        } else {
+            // 5각형/6각형: 무조건 goal(ToCenter0-2)이 아닌 경로 선택
+            for (BoardNode node : nextNodes) {
+                if (!node.getName().equals("ToCenter0-2")) {
+                    System.out.println("[DEBUG] " + sides + "각형 기본 경로: " + node.getName() + " (goal 아닌 경로)");
+                    return node;
+                }
+            }
+            System.out.println("[WARNING] " + sides + "각형에서 goal이 아닌 경로를 찾지 못함");
+        }
+        
+        // fallback: 첫 번째 옵션
+        System.out.println("[FALLBACK] 기본 경로 선택: " + nextNodes.get(0).getName());
+        return nextNodes.get(0);
     }
 
     private static boolean handleCaptureAndStacking(Token token, BoardNode node, TokenPositionManager tokenManager) {
         boolean caught = false;
         List<Token> tokensOnNode = new ArrayList<>(node.getTokens());
         
-        // 잡기 처리
+        // 잡기 처리 - 상대방 토큰들 제거
         for (Token t : tokensOnNode) {
             if (t != token && t.getOwner() != token.getOwner()) {
                 resetToken(t, tokenManager);
@@ -361,9 +518,14 @@ public class YutGameRules {
             }
         }
         
-        // 업기 처리
+        // 업기 처리 - 같은 팀 토큰들을 업기
         for (Token t : tokensOnNode) {
             if (t != token && t.getOwner() == token.getOwner()) {
+                // 업힌 토큰을 노드에서 제거
+                node.leave(t);
+                // 업힌 토큰의 위치를 null로 설정 (업힌 상태임을 표시)
+                tokenManager.updateTokenPosition(t, null);
+                // 대표 토큰에 업기
                 token.addStackedToken(t);
             }
         }
@@ -372,6 +534,14 @@ public class YutGameRules {
     }
 
     private static void resetToken(Token token, TokenPositionManager tokenManager) {
+        // 업힌 토큰들도 함께 초기화
+        for (Token stacked : token.getStackedTokens()) {
+            tokenManager.updateTokenPosition(stacked, null);
+            stacked.setState(TokenState.READY);
+            stacked.clearStackedTokens();
+        }
+        
+        // 대표 토큰 초기화
         BoardNode currentNode = tokenManager.getTokenPosition(token);
         if (currentNode != null) {
             currentNode.leave(token);
