@@ -1,25 +1,32 @@
-package com.cas.yutnorifx.view;
+package com.cas.yutnorifx.view.fx;
 
 import com.cas.yutnorifx.model.core.*;
 import com.cas.yutnorifx.model.entity.*;
 import com.cas.yutnorifx.model.event.*;
 import com.cas.yutnorifx.model.request.*;
+import com.cas.yutnorifx.view.GameEndChoice;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 
-public class InGameView implements GameEventObserver {
+/**
+ * JavaFX 기반 인게임 뷰
+ */
+public class FXInGameView implements GameEventObserver {
     // 보드 뷰
-    private final BoardView boardView;
+    private final FXBoardView boardView;
     // 플레이어 리스트 (이름, Token 리스트 보유)
     private final List<Player> players;
     // 오른쪽에 나타나는 상태 패널
@@ -35,7 +42,7 @@ public class InGameView implements GameEventObserver {
     private Runnable onRollYut;
     
     // 게임 종료 콜백
-    private java.util.function.Consumer<GameEndChoice> onGameEnd;
+    private Consumer<GameEndChoice> onGameEnd;
 
     // 분기 선택 콜백
     private java.util.function.Consumer<BranchSelectionResponse> onBranchSelection;
@@ -77,10 +84,21 @@ public class InGameView implements GameEventObserver {
         INFO, ERROR
     }
 
-    // InGameView 생성자
-    public InGameView(List<BoardNode> board, List<Player> players) {
+    // UI 컴포넌트들
+    private Button rollButton;
+    private VBox root;
+    private Scene scene;
+    private Stage stage;
+    private Label statusLabel;
+
+    // 메시지 대기열
+    private Queue<String> pendingMessages = new ConcurrentLinkedQueue<>();
+    private boolean processingMessage = false;
+
+    // FXInGameView 생성자
+    public FXInGameView(List<BoardNode> board, List<Player> players) {
         this.players = players;
-        this.boardView = new BoardView(board, players);
+        this.boardView = new FXBoardView(board, players);
 
         //상태패널 VBox 생성
         this.statusPanel = new VBox(10);
@@ -403,7 +421,7 @@ public class InGameView implements GameEventObserver {
     }
     
     // 게임 종료 콜백 설정 메서드 추가
-    public void setOnGameEnd(java.util.function.Consumer<GameEndChoice> handler) {
+    public void setOnGameEnd(Consumer<GameEndChoice> handler) {
         this.onGameEnd = handler;
     }
 

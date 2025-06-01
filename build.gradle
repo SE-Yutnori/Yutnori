@@ -1,7 +1,6 @@
 plugins {
   id 'java'
   id 'application'
-  id 'org.javamodularity.moduleplugin' version '1.8.12'
   id 'org.openjfx.javafxplugin' version '0.0.13'
   id 'org.beryx.jlink' version '2.25.0'
 }
@@ -25,14 +24,13 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-  // 모듈 시스템을 쓸 때는 mainModule과 mainClass 모두 지정
-  mainModule = 'com.cas.yutnorifx'
-  mainClass = 'com.cas.yutnorifx.YutnoriGameFX'
+  // 모듈 시스템 없이 일반 클래스패스 방식으로 실행
+  mainClass = 'com.cas.yutnorifx.YutnoriGameMain'
 }
 
 javafx {
   version = '23'
-  modules = [ 'javafx.controls', 'javafx.fxml' ]
+  modules = [ 'javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml' ]
 }
 
 java {
@@ -61,4 +59,9 @@ jlink {
 
 jlinkZip {
   group = 'distribution'
+}
+
+run {
+  // System property를 JVM에 전달
+  systemProperties System.getProperties()
 }
