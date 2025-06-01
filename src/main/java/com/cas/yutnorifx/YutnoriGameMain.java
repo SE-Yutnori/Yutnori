@@ -18,7 +18,7 @@ public class YutnoriGameMain extends Application {
     public void start(Stage primaryStage) throws Exception {
         new FXGameLauncher().start();
     }
-
+    
     public static void main(String[] args) {
         String uiType = System.getProperty("ui");
         

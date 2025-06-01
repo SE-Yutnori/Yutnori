@@ -134,9 +134,9 @@ public class SwingInGameView implements GameEventObserver {
 ## 🚀 실행 방법
 
 ### 기본 실행 (JavaFX 모드)
-```bash
-./gradlew run
-```
+   ```bash
+   ./gradlew run
+   ```
 
 ### Swing 모드로 실행
 ```bash
