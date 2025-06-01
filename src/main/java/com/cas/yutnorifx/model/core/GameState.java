@@ -292,6 +292,18 @@ public class GameState {
         return new ArrayList<>(players);
     }
 
+    public TokenPositionManager getTokenPositionManager() {
+        return tokenPositionManager;
+    }
+    
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+    
+    public void startGame() {
+        this.phase = GamePhase.IN_PROGRESS;
+    }
+
     // 한 번의 이동 처리 (Observer 패턴)
     private boolean processOneMove(int steps) {
         try {

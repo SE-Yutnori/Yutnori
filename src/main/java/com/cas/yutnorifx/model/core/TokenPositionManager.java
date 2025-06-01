@@ -1,4 +1,6 @@
-package com.cas.yutnorifx.model.entity;
+package com.cas.yutnorifx.model.core;
+
+import com.cas.yutnorifx.model.entity.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

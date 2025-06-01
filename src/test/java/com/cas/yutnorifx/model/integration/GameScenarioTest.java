@@ -2,6 +2,7 @@ package com.cas.yutnorifx.model.integration;
 
 import com.cas.yutnorifx.model.core.GameState;
 import com.cas.yutnorifx.model.core.YutGameRules;
+import com.cas.yutnorifx.model.core.TokenPositionManager;
 import com.cas.yutnorifx.model.entity.*;
 import com.cas.yutnorifx.model.event.GameEvent;
 import com.cas.yutnorifx.model.event.GameEventObserver;

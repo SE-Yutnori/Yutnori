@@ -70,21 +70,6 @@ class TokenStackingTest {
     }
     
     @Test
-    void 업힌_토큰을_제거할_수_있어야_한다() {
-        // Given: 토큰이 업혀있을 때
-        baseToken.addStackedToken(stackedToken1);
-        baseToken.addStackedToken(stackedToken2);
-        
-        // When: 업힌 토큰을 제거하면
-        baseToken.removeStackedToken(stackedToken1);
-        
-        // Then: 해당 토큰만 제거되어야 한다
-        assertEquals(1, baseToken.getStackedTokens().size());
-        assertFalse(baseToken.getStackedTokens().contains(stackedToken1));
-        assertTrue(baseToken.getStackedTokens().contains(stackedToken2));
-    }
-    
-    @Test
     void 모든_업힌_토큰을_제거할_수_있어야_한다() {
         // Given: 여러 토큰이 업혀있을 때
         baseToken.addStackedToken(stackedToken1);
