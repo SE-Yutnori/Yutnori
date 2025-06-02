@@ -1,4 +1,4 @@
-package com.cas.yutnorifx.model;
+package com.cas.yutnoriswing.model;
 
 import java.util.ArrayList;
 import java.util.List;

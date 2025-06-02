@@ -1,65 +1,73 @@
-# 윷놀이 (YutnoriFX)
+# 윷놀이 게임 (Swing 버전)
 
-JavaFX를 사용한 윷놀이 게임입니다.
+Java Swing을 사용하여 구현한 전통 윷놀이 게임입니다.
 
-## 필수 요구사항
+## 주요 기능
 
-- Java 23 SDK
-- Gradle 8.5 이상
-- JavaFX Plugin 0.0.13
+- **커스터마이징 가능한 보드**: 4각형부터 6각형까지 다양한 형태의 보드 지원
+- **멀티플레이어**: 2-4명의 플레이어 지원
+- **테스트 모드**: 윷 결과를 직접 선택할 수 있는 테스트 모드
+- **직관적인 UI**: Swing 기반의 깔끔하고 사용하기 쉬운 인터페이스
+- **실시간 게임 상태**: 플레이어별 말 상태를 실시간으로 확인
 
-## 프로젝트 설정
+## 시스템 요구사항
 
-1. **JavaFX SDK 설치**
-   - [JavaFX 23 SDK](https://gluonhq.com/products/javafx/) 다운로드
-   - 다운로드한 SDK를 원하는 위치에 압축 해제
+- Java 17 이상
+- Java Desktop (Swing) 지원 환경
 
-2. **환경 변수 설정**
-   - `JAVAFX_HOME`: JavaFX SDK가 설치된 경로
-   ```bash
-   # macOS/Linux
-   export JAVAFX_HOME=/path/to/javafx-sdk-23
-   
-   # Windows
-   set JAVAFX_HOME=C:\path\to\javafx-sdk-23
-   ```
+## 컴파일 및 실행
 
-3. **프로젝트 빌드 및 실행**
-   ```bash
-   # 프로젝트 빌드
-   ./gradlew build
-   
-   # 프로젝트 실행
-   ./gradlew run
-   ```
+### 컴파일
+```bash
+mkdir -p bin
+javac -d bin src/main/java/com/cas/yutnoriswing/model/*.java src/main/java/com/cas/yutnoriswing/view/*.java src/main/java/com/cas/yutnoriswing/controller/*.java src/main/java/com/cas/yutnoriswing/*.java src/main/java/module-info.java
+```
+
+### 실행
+```bash
+java --module-path bin -m com.cas.yutnoriswing/com.cas.yutnoriswing.YutnoriGameSwing
+```
+
+## 게임 규칙
+
+1. **보드 설정**: 게임 시작 시 4-6각형 보드를 선택할 수 있습니다.
+2. **플레이어 설정**: 2-4명의 플레이어가 참여할 수 있으며, 각 플레이어는 2-5개의 말을 사용합니다.
+3. **윷 던지기**: 
+   - 도(1칸), 개(2칸), 걸(3칸), 윷(4칸), 모(5칸), 빽도(-1칸)
+   - 윷이나 모가 나오면 추가 기회를 얻습니다.
+4. **말 이동**: 윷 결과에 따라 말을 이동시킵니다.
+5. **승리 조건**: 모든 말을 먼저 도착시키는 플레이어가 승리합니다.
 
 ## 프로젝트 구조
 
 ```
-src/main/java/com/cas/yutnorifx/
-├── YutnoriGameFX.java    # JavaFX 애플리케이션 진입점
-├── controller/             # 게임 컨트롤러
-├── model/                  # 게임 모델 (보드, 플레이어, 토큰 등)
-└── view/                   # JavaFX 기반 UI 컴포넌트
+src/main/java/com/cas/yutnoriswing/
+├── YutnoriGameSwing.java          # 메인 클래스
+├── model/                         # 게임 로직 모델
+│   ├── Board.java                 # 게임 보드
+│   ├── BoardNode.java             # 보드 노드
+│   ├── GameState.java             # 게임 상태 관리
+│   ├── Player.java                # 플레이어
+│   ├── Token.java                 # 게임 말
+│   ├── TokenState.java            # 말 상태
+│   ├── TokenPositionManager.java  # 말 위치 관리
+│   └── YutGameRules.java          # 윷놀이 규칙
+├── view/                          # UI 컴포넌트
+│   ├── GameLauncher.java          # 게임 시작 화면
+│   ├── InGameView.java            # 게임 플레이 화면
+│   ├── BoardView.java             # 보드 렌더링
+│   └── GameEndChoice.java         # 게임 종료 선택
+└── controller/                    # 게임 컨트롤러
+    └── GameController.java        # 게임 로직 제어
 ```
 
-## 게임 실행 방법
+## 변경사항 (JavaFX → Swing)
 
-1. 게임 시작 시 보드 각형 선택 (권장: 4-6각형)
-2. 테스트 모드 여부 선택
-3. 플레이어 수 입력 (2-4명)
-4. 각 플레이어의 이름 입력
-5. 말 개수 선택 (2-5개)
-6. 게임 시작!
+- **UI 프레임워크**: JavaFX에서 Java Swing으로 완전 전환
+- **빌드 시스템**: Gradle 제거, 순수 Java 컴파일 방식 사용
+- **모듈 시스템**: `java.desktop` 모듈 사용으로 변경
+- **렌더링**: Canvas 기반에서 Graphics2D 기반 렌더링으로 변경
 
-## 테스트 모드
+## 라이선스
 
-- 테스트 모드에서는 윷 결과를 직접 선택할 수 있습니다.
-- 일반 모드에서는 랜덤으로 윷이 던져집니다.
-
-## 문제 해결
-
-만약 JavaFX 관련 오류가 발생한다면:
-1. `JAVAFX_HOME` 환경 변수가 올바르게 설정되었는지 확인
-2. JavaFX SDK 버전이 Java 23과 호환되는지 확인
-3. Gradle 버전이 8.5 이상인지 확인
+이 프로젝트는 교육 목적으로 제작되었습니다.

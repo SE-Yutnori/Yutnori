@@ -1,12 +1,12 @@
-package com.cas.yutnorifx.controller;
+package com.cas.yutnoriswing.controller;
 
-import com.cas.yutnorifx.model.BoardNode;
-import com.cas.yutnorifx.model.GameState;
-import com.cas.yutnorifx.model.Player;
-import com.cas.yutnorifx.model.Token;
-import com.cas.yutnorifx.model.YutGameRules;
-import com.cas.yutnorifx.view.GameEndChoice;
-import com.cas.yutnorifx.view.InGameView;
+import com.cas.yutnoriswing.model.BoardNode;
+import com.cas.yutnoriswing.model.GameState;
+import com.cas.yutnoriswing.model.Player;
+import com.cas.yutnoriswing.model.Token;
+import com.cas.yutnoriswing.model.YutGameRules;
+import com.cas.yutnoriswing.view.GameEndChoice;
+import com.cas.yutnoriswing.view.InGameView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class GameController {
         }
 
         // 3. 이동 처리
-        boolean catched = handleMoveExecution(currentPlayer, orderedResults);
+        boolean catched = handleMoveExecution(orderedResults);
 
         // 4. 승리 조건 확인
         if (gameState.isGameEnded()) {
@@ -164,12 +164,10 @@ public class GameController {
     }
 
     // 이동 실행 처리
-    private boolean handleMoveExecution(Player player, List<Integer> steps) {
+    private boolean handleMoveExecution(List<Integer> steps) {
         boolean overallCatched = false;
         
-        for (int i = 0; i < steps.size(); i++) {
-            int step = steps.get(i);
-            
+        for (int step : steps) {
             // 1. 이동 가능한 토큰 계산
             List<Token> availableTokens = gameState.getMovableTokens(step);
             

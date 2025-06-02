@@ -1,8 +1,5 @@
-module com.cas.yutnorifx {
-    requires javafx.controls;
-    requires javafx.fxml;
+module com.cas.yutnoriswing {
+    requires java.desktop;
 
-
-    opens com.cas.yutnorifx to javafx.fxml;
-    exports com.cas.yutnorifx;
+    exports com.cas.yutnoriswing;
 }
