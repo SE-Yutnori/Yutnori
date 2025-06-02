@@ -18,13 +18,13 @@ Java Swing을 사용하여 구현한 전통 윷놀이 게임입니다.
 ## 컴파일 및 실행
 
 ### 컴파일
-```bash
+   ```bash
 mkdir -p bin
 javac -d bin src/main/java/com/cas/yutnoriswing/model/*.java src/main/java/com/cas/yutnoriswing/view/*.java src/main/java/com/cas/yutnoriswing/controller/*.java src/main/java/com/cas/yutnoriswing/*.java src/main/java/module-info.java
 ```
 
 ### 실행
-```bash
+   ```bash
 java --module-path bin -m com.cas.yutnoriswing/com.cas.yutnoriswing.YutnoriGameSwing
 ```
 
