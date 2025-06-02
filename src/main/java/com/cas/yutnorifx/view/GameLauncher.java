@@ -1,8 +1,6 @@
 package com.cas.yutnorifx.view;
 
 import com.cas.yutnorifx.controller.GameController;
-import com.cas.yutnorifx.model.Board;
-import com.cas.yutnorifx.model.Player;
 import com.cas.yutnorifx.model.YutGameRules;
 import com.cas.yutnorifx.model.GameState;
 

@@ -25,13 +25,13 @@ public class BoardView extends Pane {
     // 첫 번째 노드 (시작 노드) 참조
     private final BoardNode startNode;
 
-    private static final int SPACING = 180;
+    private static final int SPACING = 140;
     private static final int OFFSET = 10;
 
     public BoardView(List<BoardNode> nodes, List<Player> players) {
         this.nodes = nodes;
         this.players = players;
-        this.canvas = new Canvas(SPACING * 8, SPACING * 5);
+        this.canvas = new Canvas(SPACING * 6, SPACING * 6);
         this.gc = canvas.getGraphicsContext2D();
         getChildren().add(canvas);
         
@@ -108,14 +108,13 @@ public class BoardView extends Pane {
         for (BoardNode node : nodes) {
             int x = (int) (node.getX() * SPACING + OFFSET);
             int y = (int) (node.getY() * SPACING + OFFSET);
-            String name = node.getName();
 
             int out = 56;
-            int radius = 36;
+            int inner = 36;
             // 중요한 노드들 (Center, 모서리 시작점, 모서리 끝점)은 특별한 원으로 표시
-            boolean isImportantNode = name.equals("Center") || 
-                                    name.matches("Edge\\d+-0") || 
-                                    name.matches("Edge\\d+-5"); // 현재는 6개 노드(0~5)로 고정되어 있음
+            boolean isImportantNode = node.getName().equals("Center") || 
+                                    node.getName().matches("Edge\\d+-0") || 
+                                    node.getName().matches("Edge\\d+-5"); // 현재는 6개 노드(0~5)로 고정되어 있음
             
             if (isImportantNode) {
                 int outX = x - out / 2;
@@ -125,20 +124,19 @@ public class BoardView extends Pane {
                 gc.setStroke(Color.BLACK);
                 gc.strokeOval(outX, outY, out, out);
 
-                int in = 36;
-                int inX = x - in / 2;
-                int inY = y - in / 2;
+                int inX = x - inner / 2;
+                int inY = y - inner / 2;
                 gc.setFill(Color.WHITE);
-                gc.fillOval(inX, inY, in, in);
+                gc.fillOval(inX, inY, inner, inner);
                 gc.setStroke(Color.BLACK);
-                gc.strokeOval(inX, inY, in, in);
+                gc.strokeOval(inX, inY, inner, inner);
             } else {
-                int drawX = x - radius / 2;
-                int drawY = y - radius / 2;
+                int drawX = x - inner / 2;
+                int drawY = y - inner / 2;
                 gc.setFill(Color.WHITE);
-                gc.fillOval(drawX, drawY, radius, radius);
+                gc.fillOval(drawX, drawY, inner, inner);
                 gc.setStroke(Color.BLACK);
-                gc.strokeOval(drawX, drawY, radius, radius);
+                gc.strokeOval(drawX, drawY, inner, inner);
             }
 
             // 시작 노드 표시 (동적으로 찾은 시작 노드)
@@ -149,13 +147,6 @@ public class BoardView extends Pane {
                 int textY = y - out/2;
                 gc.fillText("start", textX, textY);
             }
-            
-            // 모든 노드의 이름 표시
-            gc.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
-            gc.setFill(Color.BLUE);
-            int nameX = x - name.length() * 3; // 텍스트 중앙 정렬 근사치
-            int nameY = y + (isImportantNode ? out/2 + 15 : radius/2 + 15);
-            gc.fillText(name, nameX, nameY);
         }
 
         // 말 표시
