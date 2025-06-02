@@ -1,0 +1,25 @@
+@startuml
+boundary InGameView
+control GameController
+entity YutGameRules
+
+InGameView -> GameController: rollingYut()  **윷 던지기 액션 트리거**
+activate GameController
+
+GameController -> YutGameRules: accumulateYut()  **윷 던지기 결과 누적 계산**
+activate YutGameRules
+YutGameRules -> YutGameRules: toss sticks & compute result  **윷/모 추가던지기 포함 결과 산출**
+return rawResults  **던지기 결과들 (예: [도, 윷])**
+deactivate YutGameRules
+
+GameController -> YutGameRules: reorderResults(rawResults)  **결과 정렬/재배치 (규칙 적용)**
+activate YutGameRules
+YutGameRules -> YutGameRules: apply ordering rules  **결과 순서 결정**
+return orderedResults  **최종 정렬된 결과 리스트**
+deactivate YutGameRules
+
+GameController --> InGameView: return results  **윷 던지기 결과 반환**
+deactivate GameController
+
+InGameView -> InGameView: displayYutResult(orderedResults)  **던지기 결과 UI 표시 (예: \"도 + 윷\")**
+@enduml

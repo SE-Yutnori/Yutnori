@@ -1,0 +1,91 @@
+@startuml
+actor Main
+boundary GameLauncher
+control GameController
+entity BoardBuilder
+entity BoardNode
+entity Player1
+entity Player2
+entity Token
+boundary BoardPanel
+boundary InGameView
+
+Main -> GameLauncher: start()
+note right: 게임 런처 화면 시작
+activate GameLauncher
+
+GameLauncher -> GameController: startGame(settings)
+note right: 설정 정보를 전달하여 게임 시작 요청
+activate GameController
+
+GameController -> BoardBuilder: buildCustomizingBoard(settings)
+note right: 보드 빌드 (사용자 설정 반영)
+activate BoardBuilder
+
+loop 각 보드 칸 생성
+    create BoardNode
+    BoardBuilder -> BoardNode: new BoardNode(index)
+    note right: 보드 노드 객체 생성
+    BoardBuilder <-- BoardNode: boardNode
+    note left: 새 보드 칸 객체 반환
+end
+
+BoardBuilder --> GameController: boardLayout
+note left: 연결된 전체 보드 구조 반환
+deactivate BoardBuilder
+
+create Player1
+GameController -> Player1: new Player1()
+note right: 플레이어 1 생성
+activate Player1
+
+loop Player1의 말 4개 생성
+    create Token
+    Player1 -> Token: new Token()
+    note right: 새 말 객체 생성
+    Player1 <-- Token: token
+end
+deactivate Player1
+
+create Player2
+GameController -> Player2: new Player2()
+note right: 플레이어 2 생성
+activate Player2
+
+loop Player2의 말 4개 생성
+    create Token
+    Player2 -> Token: new Token()
+    Player2 <-- Token: token
+end
+deactivate Player2
+
+GameController -> GameLauncher: launchGameView()
+note right: 설정 완료, 게임 화면 전환 요청
+
+create InGameView
+GameLauncher -> InGameView: new InGameView()
+note right: 메인 게임 화면 생성
+activate InGameView
+
+GameLauncher -> GameLauncher: close()
+note right: 런처 화면 종료
+deactivate GameLauncher
+
+create BoardPanel
+InGameView -> BoardPanel: new BoardPanel()
+note right: 보드 패널 생성 및 초기화
+activate BoardPanel
+
+BoardPanel -> GameController: requestBoardData()
+note right: 보드 구성 정보 요청
+
+GameController --> BoardPanel: board nodes & layout
+note left: 보드 연결 구조 전달
+
+BoardPanel -> BoardPanel: paintComponent()
+note right: 보드와 초기 말 위치 그리기
+deactivate BoardPanel
+
+deactivate InGameView
+deactivate GameController
+@enduml

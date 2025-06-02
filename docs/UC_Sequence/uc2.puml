@@ -1,0 +1,44 @@
+@startuml
+boundary BoardPanel
+control GameController
+entity YutGameRules
+entity Token_active <<Token>>
+entity Token_ally <<Token>>
+entity Token_enemy <<Token>>
+entity Player_active <<Player>>
+
+BoardPanel -> GameController: moveToken(selectedToken)  **말 선택 (말 이동 요청)**
+activate GameController
+
+GameController -> YutGameRules: applyMoves(token)  **선택된 말 이동 처리 호출**
+activate YutGameRules
+
+YutGameRules -> Token_active: move(distance)  **말 이동 (주어진 칸 수만큼)**
+activate Token_active
+Token_active --> YutGameRules: moved  **이동 완료**
+deactivate Token_active
+
+alt **Token reaches end (골인)**
+    YutGameRules -> Token_active: finishToken()  **말 골인 처리**
+    activate Token_active
+    Token_active -> Token_active: state = FINISHED  **말 상태를 FINISHED로 설정**
+    deactivate Token_active
+    YutGameRules -> Player_active: markTokenFinished()  **플레이어의 완주 말 개수 업데이트**
+else **Target node has ally token (말 업기)**
+    YutGameRules -> Token_ally: joinStack(Token_active)  **같은 팀 말과 쌓기**
+else **Target node has enemy token (말 잡기)**
+    YutGameRules -> Token_enemy: captureToken()  **상대 말 잡기**
+    activate Token_enemy
+    Token_enemy -> Token_enemy: state = BASE  **상대 말 상태 초기화 (시작 위치로)**
+    deactivate Token_enemy
+end
+YutGameRules --> GameController: move complete  **이동 및 후속 처리 완료**
+deactivate YutGameRules
+
+GameController --> BoardPanel: refreshBoard()  **보드 갱신 요청**
+BoardPanel -> GameController: getBoardState()  **최신 말 위치 요청**
+GameController --> BoardPanel: token positions/state  **말들의 현재 위치/상태 전달**
+BoardPanel -> BoardPanel: paintComponent()  **변경된 상태로 보드 다시 그리기**
+
+deactivate GameController
+@enduml

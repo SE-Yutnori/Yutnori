@@ -1,0 +1,67 @@
+@startuml
+boundary InGameView
+control GameController
+entity YutGameRules
+entity Player1
+entity Player2
+entity Token
+boundary GameEndChoice
+boundary GameLauncher
+
+InGameView -> GameController: endTurn()  **턴 종료 시 게임 상태 검사 요청**
+activate GameController
+
+GameController -> YutGameRules: checkVictory()  **모든 말 골인 여부 확인**
+activate YutGameRules
+
+YutGameRules -> Player1: hasAllTokensFinished()?  **플레이어1의 모든 말 FINISHED 상태인지**
+activate Player1
+loop (for each Token in Player1)
+    Player1 -> Token: getState()
+    Token --> Player1: state  **예: FINISHED/IN_PLAY**
+end
+Player1 --> YutGameRules: true/false  **모든 말 완료 여부**
+deactivate Player1
+
+alt **Player1 모든 말 FINISHED (승리)**
+    note right: Player1 승리 (Player2 확인 불필요)
+    YutGameRules --> GameController: winner = Player1
+else **Player1 not finished**
+    YutGameRules -> Player2: hasAllTokensFinished()?  **플레이어2의 말들도 확인**
+    activate Player2
+    loop (for each Token in Player2)
+        Player2 -> Token: getState()
+        Token --> Player2: state
+    end
+    Player2 --> YutGameRules: true/false
+    deactivate Player2
+
+    alt **Player2 모든 말 FINISHED (승리)**
+        YutGameRules --> GameController: winner = Player2
+    else
+        YutGameRules --> GameController: noWinner (game continues)
+    end
+end
+deactivate YutGameRules
+
+alt **winner exists (게임 종료)**
+    GameController -> GameEndChoice: showResult(winner)  **승자 결과 화면 표시**
+    activate GameEndChoice
+    GameEndChoice -> GameController: userChoice(restart or exit)  **사용자 선택 전달**
+    activate GameController
+
+    alt **사용자 선택: 새 게임**
+        GameController -> GameLauncher: start()  **게임 재시작 (초기 화면)**
+    else **사용자 선택: 종료**
+        GameController -> Main: exitGame()  **게임 종료 및 프로그램 종료**
+    end
+    deactivate GameController
+    GameEndChoice -> GameEndChoice: close()  **결과 창 닫기**
+    deactivate GameEndChoice
+
+else **no winner (게임 지속)**
+    GameController -> InGameView: continue to next turn  **승자 없음, 다음 턴 진행**
+end
+
+deactivate GameController
+@enduml

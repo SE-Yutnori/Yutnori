@@ -1,0 +1,34 @@
+@startuml
+boundary BoardPanel
+control GameController
+entity YutGameRules
+entity Token_active <<Token>>
+
+BoardPanel -> GameController: choosePath(token, direction)  **분기점에서 방향 선택 입력 전달**
+activate GameController
+
+alt **선택: 직진 경로**
+    GameController -> YutGameRules: continueMoveStraight(token)  **직진 경로로 남은 이동 처리**
+    activate YutGameRules
+    YutGameRules -> Token_active: move(remainingDistance) [straight]  **말 직진 이동**
+    activate Token_active
+    Token_active --> YutGameRules: moved (straight path)
+    deactivate Token_active
+    deactivate YutGameRules
+else **선택: 지름길 경로**
+    GameController -> YutGameRules: continueMoveShortcut(token)  **지름길로 남은 이동 처리**
+    activate YutGameRules
+    YutGameRules -> Token_active: move(remainingDistance) [shortcut]  **말 지름길 이동**
+    activate Token_active
+    Token_active --> YutGameRules: moved (shortcut path)
+    deactivate Token_active
+    deactivate YutGameRules
+end
+
+GameController --> BoardPanel: refreshBoard()  **보드 갱신 요청 (분기점 이동 결과 반영)**
+BoardPanel -> GameController: getBoardState()
+GameController --> BoardPanel: updated token position
+BoardPanel -> BoardPanel: paintComponent()  **말의 새로운 위치로 보드 다시 그리기**
+
+deactivate GameController
+@enduml
