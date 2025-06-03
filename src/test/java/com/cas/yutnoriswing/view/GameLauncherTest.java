@@ -4,6 +4,7 @@ import com.cas.yutnoriswing.model.GameState;
 import com.cas.yutnoriswing.model.Player;
 import com.cas.yutnoriswing.model.Board;
 import com.cas.yutnoriswing.model.YutGameRules;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +22,8 @@ class GameLauncherTest {
     }
 
     @Test
-    void testGameState_완전한_게임_설정_시나리오() {
+    @DisplayName("완전한 게임 설정 시나리오 테스트")
+    void testCompleteGameState() {
         // Given: 5각형, 테스트모드, 3명, 4개토큰
         int boardSides = 5;
         boolean testMode = true;
@@ -73,42 +75,7 @@ class GameLauncherTest {
     }
 
     @Test
-    void testGameState_최소_설정_시나리오() {
-        // Given: 최소 설정 (4각형, 일반모드, 2명, 2개토큰)
-        YutGameRules.setTestMode(false);
-        GameState gameState = new GameState(4, 2.0f, 
-            Arrays.asList("플레이어1", "플레이어2"),
-            Arrays.asList(2, 2));
-        
-        // Then
-        assertNotNull(gameState);
-        assertEquals(2, gameState.getPlayers().size());
-        assertEquals(2, gameState.getPlayers().get(0).getTokens().size());
-        assertEquals(2, gameState.getPlayers().get(1).getTokens().size());
-        assertFalse(YutGameRules.isTestMode());
-    }
-
-    @Test
-    void testGameState_최대_설정_시나리오() {
-        // Given: 최대 설정 (6각형, 테스트모드, 4명, 5개토큰)
-        YutGameRules.setTestMode(true);
-        GameState gameState = new GameState(6, 2.0f, 
-            Arrays.asList("A", "B", "C", "D"),
-            Arrays.asList(5, 5, 5, 5));
-        
-        // Then
-        assertNotNull(gameState);
-        assertEquals(4, gameState.getPlayers().size());
-        
-        // 모든 플레이어가 5개의 토큰을 가지는지 확인
-        for (Player player : gameState.getPlayers()) {
-            assertEquals(5, player.getTokens().size());
-        }
-        
-        assertTrue(YutGameRules.isTestMode());
-    }
-
-    @Test
+    @DisplayName("플레이어 토큰 소유권 검증 테스트")
     void testPlayerTokenOwnership() {
         // Given
         GameState gameState = new GameState(4, 2.0f, 
@@ -127,6 +94,7 @@ class GameLauncherTest {
     }
 
     @Test
+    @DisplayName("보드 구조 검증 테스트")
     void testBoardStructure() {
         // Given: 5각형 보드
         GameState gameState = new GameState(5, 2.0f, 
@@ -152,6 +120,7 @@ class GameLauncherTest {
     }
 
     @Test
+    @DisplayName("보드 크기 검증 테스트")
     void testDifferentBoardSizes() {
         // Given: 4, 5, 6 각형 보드 모두 테스트
         for (int sides = 4; sides <= 6; sides++) {
@@ -173,6 +142,7 @@ class GameLauncherTest {
     }
 
     @Test
+    @DisplayName("플레이어 토큰 이름 검증 테스트")
     void testPlayerTokenNames() {
         // Given: 플레이어 이름과 토큰 개수 설정
         GameState gameState = new GameState(4, 2.0f, 

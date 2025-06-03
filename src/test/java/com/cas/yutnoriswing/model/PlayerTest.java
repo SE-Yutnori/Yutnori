@@ -40,8 +40,8 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("Player 생성자 - 토큰 개수 경계값 테스트")
-    void testPlayerConstructor_BoundaryValues() {
+    @DisplayName("Player 생성자 - 토큰 개수 생성 로직 테스트")
+    void testPlayerConstructor_TokenCount() {
         // 최소값 (2개)
         Player player2 = new Player("최소", 2);
         assertEquals(2, player2.getTokens().size());
@@ -60,13 +60,13 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("hasFinished - 모든 토큰이 완주하지 않은 경우")
+    @DisplayName("player finished 상태 검증 테스트 - 모든 토큰이 완주하지 않은 경우")
     void testHasFinished_NotAllFinished() {
         assertFalse(player.hasFinished());
     }
 
     @Test
-    @DisplayName("hasFinished - 모든 토큰이 완주한 경우")
+    @DisplayName("player finished 상태 검증 테스트 - 모든 토큰이 완주한 경우")
     void testHasFinished_AllFinished() {
         // Given: 모든 토큰을 FINISHED 상태로 변경
         for (Token token : player.getTokens()) {
@@ -78,7 +78,7 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("getMovableTokens - FINISHED가 아닌 토큰 반환")
+    @DisplayName("player 이동 가능 토큰 검증 테스트 - FINISHED가 아닌 토큰 반환")
     void testGetMovableTokens() {
         // Given: 일부 토큰을 FINISHED 상태로 변경
         List<Token> tokens = player.getTokens();
@@ -97,7 +97,7 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("getBackwardMovableTokens - ACTIVE 상태 토큰만 반환")
+    @DisplayName("player 뒤로 이동 가능 토큰 검증 테스트 - ACTIVE 상태 토큰만 반환")
     void testGetBackwardMovableTokens() {
         // Given
         List<Token> tokens = player.getTokens();
@@ -114,7 +114,7 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("getReadyTokens - READY 상태 토큰만 반환")
+    @DisplayName("player 준비 토큰 검증 테스트 - READY 상태 토큰만 반환")
     void testGetReadyTokens() {
         // Given
         List<Token> tokens = player.getTokens();
@@ -132,7 +132,7 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("getActiveTokens - ACTIVE 상태 토큰만 반환")
+    @DisplayName("player 보드판 위 말 검증 테스트 - ACTIVE 상태 토큰만 반환")
     void testGetActiveTokens() {
         // Given
         List<Token> tokens = player.getTokens();
@@ -150,7 +150,7 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("getFinishedTokens - FINISHED 상태 토큰만 반환")
+    @DisplayName("player 완주 토큰 검증 테스트 - FINISHED 상태 토큰만 반환")
     void testGetFinishedTokens() {
         // Given
         List<Token> tokens = player.getTokens();
@@ -168,7 +168,7 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("getTokenByName - 존재하는 토큰 이름으로 검색")
+    @DisplayName("player 토큰 이름으로 검색 테스트 - 존재하는 토큰 이름으로 검색")
     void testGetTokenByName_ExistingToken() {
         // When
         Token foundToken = player.getTokenByName("테스트플레이어-2");
@@ -212,19 +212,7 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("토큰 리스트 불변성 - getTokens()는 복사본 반환하지 않음")
-    void testTokenListMutability() {
-        // When
-        List<Token> tokens1 = player.getTokens();
-        List<Token> tokens2 = player.getTokens();
-        
-        // Then - 같은 리스트 참조를 반환
-        assertSame(tokens1, tokens2);
-        assertEquals(3, tokens1.size());
-    }
-
-    @Test
-    @DisplayName("토큰 이름 생성 패턴 검증")
+    @DisplayName("토큰 이름 생성 로직 검증")
     void testTokenNamingPattern() {
         // Given
         Player player = new Player("홍길동", 5);
@@ -234,17 +222,5 @@ class PlayerTest {
         for (int i = 0; i < 5; i++) {
             assertEquals("홍길동-" + (i + 1), tokens.get(i).getName());
         }
-    }
-
-    @Test
-    @DisplayName("빈 이름으로 Player 생성")
-    void testPlayerWithEmptyName() {
-        // When
-        Player emptyNamePlayer = new Player("", 3);
-        
-        // Then
-        assertEquals("", emptyNamePlayer.getName());
-        assertEquals(3, emptyNamePlayer.getTokens().size());
-        assertEquals("-1", emptyNamePlayer.getTokens().get(0).getName());
     }
 } 

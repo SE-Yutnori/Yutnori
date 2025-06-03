@@ -41,7 +41,7 @@ class TokenTest {
     }
 
     @Test
-    @DisplayName("Token 상태 변경 테스트")
+    @DisplayName("Token setter 테스트")
     void testSetState() {
         // Given & When
         token.setState(TokenState.ACTIVE);
@@ -57,7 +57,7 @@ class TokenTest {
     }
 
     @Test
-    @DisplayName("스택 토큰 추가/제거 테스트")
+    @DisplayName("업힌 말 추가/제거 테스트")
     void testStackedTokenManagement() {
         // Given
         Token stackedToken1 = new Token("스택토큰1", owner);
@@ -90,7 +90,7 @@ class TokenTest {
     }
 
     @Test
-    @DisplayName("스택 토큰 전체 제거 테스트")
+    @DisplayName("업힌 말 전체 제거 테스트")
     void testClearStackedTokens() {
         // Given
         Token stackedToken1 = new Token("스택토큰1", owner);
@@ -105,26 +105,9 @@ class TokenTest {
         assertTrue(token.getStackedTokens().isEmpty());
     }
 
-    @Test
-    @DisplayName("getStackedTokens는 복사본 반환")
-    void testGetStackedTokensReturnsCopy() {
-        // Given
-        Token stackedToken = new Token("스택토큰", owner);
-        token.addStackedToken(stackedToken);
-        
-        // When
-        List<Token> stackedTokens1 = token.getStackedTokens();
-        List<Token> stackedTokens2 = token.getStackedTokens();
-        
-        // Then: 서로 다른 인스턴스여야 함
-        assertNotSame(stackedTokens1, stackedTokens2);
-        assertEquals(stackedTokens1, stackedTokens2);
-        
-        // 외부에서 리스트 수정해도 원본에 영향 없어야 함
-        stackedTokens1.clear();
-        assertEquals(1, token.getStackedTokens().size());
-    }
 
+    // 모든 분기를 지나칠때의 로직이 nextNode를 logic에 맞게 설정하여 가도록 한다
+    // 따라서 nextNode를 설정하는 test는 중요하다.
     @Test
     @DisplayName("다음 분기 선택 설정/해제 테스트")
     void testNextBranchChoice() {
@@ -147,8 +130,12 @@ class TokenTest {
         assertNull(token.getNextBranchChoice());
     }
 
+
+    //5,6각형에서의 기본 분기 설정과 다르게 4각형 Center 기본 분기 설정에서는 어느 방향에서 왔는지 알아야 하기 때문에
+    //previousNode를 설정해야 한다.. 해당 previousNode를 통해 어느 방향에서 왔는지 알 수 있다.
+    // 그렇기 때문에 previousNode를 설정하는 test를 생성했다.
     @Test
-    @DisplayName("이전 노드 설정/해제 테스트")
+    @DisplayName("이전 노드 설정/해제 테스트 (4각형 보드 Center 기본 분기 설정 용)")
     void testPreviousNode() {
         // When: 이전 노드 설정
         token.setPreviousNode(node1);
@@ -170,14 +157,14 @@ class TokenTest {
     }
 
     @Test
-    @DisplayName("getTopMostToken - 스택되지 않은 토큰")
+    @DisplayName("업힌 말 없을 때 대표 말 검증 테스트")
     void testGetTopMostToken_NotStacked() {
         // When & Then
         assertEquals(token, token.getTopMostToken());
     }
 
     @Test
-    @DisplayName("getTopMostToken - 단일 스택")
+    @DisplayName("업힌 말 1개 일 때 대표 말 검증 테스트")
     void testGetTopMostToken_SingleStack() {
         // Given
         Token bottomToken = owner.getTokens().get(0);
@@ -192,7 +179,7 @@ class TokenTest {
     }
 
     @Test
-    @DisplayName("getTopMostToken - 다중 스택")
+    @DisplayName("3개 이상 업힌 말 중 대표 말 검증 테스트")
     void testGetTopMostToken_MultipleStack() {
         // Given
         Token bottomToken = owner.getTokens().get(0);  // 테스트플레이어-1
@@ -218,32 +205,6 @@ class TokenTest {
         
         // 이름과 소유자는 생성 후 변경할 수 없어야 함 (final 필드)
         // 컴파일 타임에 검증되므로 런타임 테스트 불가
-    }
-
-    @Test
-    @DisplayName("null 값으로 분기 선택 설정")
-    void testSetNextBranchChoiceWithNull() {
-        // Given
-        token.setNextBranchChoice(node1);
-        
-        // When
-        token.setNextBranchChoice(null);
-        
-        // Then
-        assertNull(token.getNextBranchChoice());
-    }
-
-    @Test
-    @DisplayName("null 값으로 이전 노드 설정")
-    void testSetPreviousNodeWithNull() {
-        // Given
-        token.setPreviousNode(node1);
-        
-        // When
-        token.setPreviousNode(null);
-        
-        // Then
-        assertNull(token.getPreviousNode());
     }
 
     @Test

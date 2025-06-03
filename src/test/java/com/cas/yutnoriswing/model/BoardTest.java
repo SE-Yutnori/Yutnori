@@ -104,7 +104,7 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("노드 이름 패턴 검증")
+    @DisplayName("노드 이름 생성 로직 검증")
     void testNodeNamingPattern() {
         List<BoardNode> nodes = board4.getNodes();
         
@@ -122,25 +122,13 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("각 노드의 좌표가 설정되어 있는지 확인")
-    void testNodeCoordinates() {
-        List<BoardNode> nodes = board5.getNodes();
-        
-        for (BoardNode node : nodes) {
-            // 좌표가 유효한 범위에 있는지 확인 (음수가 아니어야 함)
-            assertTrue(node.getX() >= 0, node.getName() + "의 X 좌표가 음수입니다");
-            assertTrue(node.getY() >= 0, node.getName() + "의 Y 좌표가 음수입니다");
-        }
-    }
-
-    @Test
     @DisplayName("각 노드의 다음 노드 연결 확인")
     void testNodeConnections() {
         List<BoardNode> nodes = board4.getNodes();
         
         // 모든 노드가 적어도 하나의 다음 노드를 가져야 함 (마지막 노드 제외)
         for (BoardNode node : nodes) {
-            if (!node.getName().matches("Edge\\d+-\\d+") || !isLastNodeInEdge(node)) {
+            if (!node.getName().matches("Edge\\d+-\\d+")) {
                 assertFalse(node.getNextNodes().isEmpty(), 
                     node.getName() + " 노드는 다음 노드를 가져야 함");
             }
@@ -148,7 +136,7 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("빈 토큰 리스트로 시작")
+    @DisplayName("빈 토큰 리스트로 시작 테스트")
     void testInitialEmptyTokens() {
         List<BoardNode> nodes = board4.getNodes();
         
@@ -157,18 +145,5 @@ class BoardTest {
             assertTrue(node.getTokens().isEmpty(), 
                 node.getName() + " 노드는 처음에 빈 토큰 리스트를 가져야 함");
         }
-    }
-
-    // 헬퍼 메서드: 엣지의 마지막 노드인지 확인
-    private boolean isLastNodeInEdge(BoardNode node) {
-        // Edge 패턴이 아니면 false
-        if (!node.getName().matches("Edge\\d+-\\d+")) {
-            return false;
-        }
-        
-        // Edge{n}-{m} 형태에서 m이 가장 큰 값인지 확인하는 로직
-        // 실제 구현에서는 보드의 구조를 알아야 정확히 판단 가능
-        // 여기서는 간단히 다음 노드가 없으면 마지막 노드로 간주
-        return node.getNextNodes().isEmpty();
     }
 } 

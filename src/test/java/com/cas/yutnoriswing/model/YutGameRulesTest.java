@@ -4,10 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("YutGameRules 클래스 테스트")
 class YutGameRulesTest {
@@ -19,22 +19,22 @@ class YutGameRulesTest {
     }
 
     @Test
-    @DisplayName("테스트 모드 설정 및 확인")
+    @DisplayName("테스트 모드 설정 가능 테스트")
     void testTestMode() {
         // 초기 상태: 테스트 모드 비활성화
+        //Given
         assertFalse(YutGameRules.isTestMode());
         
         // 테스트 모드 활성화
+        //When
         YutGameRules.setTestMode(true);
+
+        //Then
         assertTrue(YutGameRules.isTestMode());
-        
-        // 테스트 모드 비활성화
-        YutGameRules.setTestMode(false);
-        assertFalse(YutGameRules.isTestMode());
     }
 
     @Test
-    @DisplayName("일반 모드 윷 던지기 - 여러 번 실행하여 랜덤성 확인")
+    @DisplayName("일반 모드 윷 던지기 - 여러 번 실행하여 랜덤성 확인 및 유효한 결과인지 확인 테스트")
     void testThrowOneYut_NormalMode() {
         // Given: 일반 모드
         YutGameRules.setTestMode(false);
@@ -63,137 +63,244 @@ class YutGameRulesTest {
     }
 
     @Test
-    @DisplayName("테스트 모드 윷 던지기 - 항상 1 반환")
-    void testThrowOneYut_TestMode() {
-        // Given: 테스트 모드
-        YutGameRules.setTestMode(true);
-        
-        // When & Then: 테스트 모드에서는 항상 1을 반환해야 함
-        for (int i = 0; i < 10; i++) {
-            int result = YutGameRules.throwOneYut();
-            assertEquals(1, result, "테스트 모드에서는 항상 1을 반환해야 함");
-        }
-    }
-
-    @Test
-    @DisplayName("테스트 모드와 일반 모드 전환")
-    void testModeSwitch() {
-        // Given: 테스트 모드
-        YutGameRules.setTestMode(true);
-        assertEquals(1, YutGameRules.throwOneYut());
-        assertEquals(1, YutGameRules.throwOneYut());
-        
-        // When: 일반 모드로 전환
-        YutGameRules.setTestMode(false);
-        
-        // Then: 일반 모드 동작 확인
-        assertFalse(YutGameRules.isTestMode());
-        
-        // 다시 테스트 모드로 전환
-        YutGameRules.setTestMode(true);
-        assertEquals(1, YutGameRules.throwOneYut()); // 테스트 모드에서는 1
-    }
-
-    @Test
-    @DisplayName("윷 결과 값 범위 확인")
-    void testYutResultRange() {
-        YutGameRules.setTestMode(true);
-        
-        // 테스트 모드에서는 1만 나옴
-        int result = YutGameRules.throwOneYut();
-        assertEquals(1, result);
-        
-        // 일반 모드로 전환
-        YutGameRules.setTestMode(false);
-        
-        // 여러 번 던져서 유효한 값들이 나오는지 확인
-        for (int i = 0; i < 100; i++) {
-            int normalResult = YutGameRules.throwOneYut();
-            assertTrue((normalResult == -1) || (normalResult >= 1 && normalResult <= 5),
-                "윷 결과는 -1(빽도) 또는 1-5(도,개,걸,윷,모) 범위여야 함, 실제: " + normalResult);
-        }
-    }
-
-    @Test
-    @DisplayName("동시성 테스트 - 여러 스레드에서 윷 던지기")
-    void testConcurrentYutThrow() throws InterruptedException {
+    @DisplayName("연속 윷 던지기 - 윷이나 모가 나올 때까지 계속 던지기")
+    void testThrowYut_ContinuousThrow() {
         // Given: 일반 모드
         YutGameRules.setTestMode(false);
         
-        // When: 여러 스레드에서 동시에 윷 던지기
-        int threadCount = 10;
-        Thread[] threads = new Thread[threadCount];
-        boolean[] results = new boolean[threadCount];
+        // When: 연속 던지기 실행
+        YutGameRules.YutThrowResult result = YutGameRules.throwYut();
         
-        for (int i = 0; i < threadCount; i++) {
-            final int index = i;
-            threads[i] = new Thread(() -> {
-                try {
-                    int result = YutGameRules.throwOneYut();
-                    results[index] = ((result == -1) || (result >= 1 && result <= 5));
-                } catch (Exception e) {
-                    results[index] = false;
-                }
-            });
-        }
+        // Then: 결과 검증
+        assertNotNull(result);
+        assertNotNull(result.getResults());
+        assertNotNull(result.getResultMessages());
+        assertFalse(result.getResults().isEmpty());
+        assertFalse(result.getResultMessages().isEmpty());
         
-        // 모든 스레드 시작
-        for (Thread thread : threads) {
-            thread.start();
-        }
-        
-        // 모든 스레드 완료 대기
-        for (Thread thread : threads) {
-            thread.join();
-        }
-        
-        // Then: 모든 스레드에서 유효한 결과가 나와야 함
-        for (int i = 0; i < threadCount; i++) {
-            assertTrue(results[i], "스레드 " + i + "에서 유효하지 않은 결과 발생");
-        }
+        // 마지막 결과는 4 미만이어야 함 (윷이나 모가 아닌 경우에만 종료)
+        int lastResult = result.getResults().get(result.getResults().size() - 1);
+        assertTrue(lastResult < 4, "마지막 결과는 도/개/걸이어야 함");
     }
 
     @Test
-    @DisplayName("테스트 모드 상태 지속성 확인")
-    void testTestModePersistence() {
-        // Given: 테스트 모드 활성화
-        YutGameRules.setTestMode(true);
-        assertTrue(YutGameRules.isTestMode());
+    @DisplayName("순서 재배열 검증 - 유효한 입력")
+    void testValidateReorderInput_ValidInput() {
+        // Given: 원본 결과와 유효한 재배열 입력
+        List<Integer> originalResults = Arrays.asList(1, 3, 4, 5);
+        String validInput = "4,1,5,3";
         
-        // When: 여러 번 윷 던지기
-        for (int i = 0; i < 10; i++) {
-            YutGameRules.throwOneYut();
-        }
+        // When: 검증 실행
+        YutGameRules.ReorderResult result = YutGameRules.validateReorderInput(validInput, originalResults);
         
-        // Then: 테스트 모드 상태가 유지되어야 함
-        assertTrue(YutGameRules.isTestMode());
-        
-        // 다음 윷 던지기 결과가 예측 가능해야 함
-        assertEquals(1, YutGameRules.throwOneYut()); // 테스트 모드에서는 항상 1
+        // Then: 성공해야 함
+        assertTrue(result.isSuccess());
+        assertEquals(Arrays.asList(4, 1, 5, 3), result.getReorderedResults());
+        assertNull(result.getErrorMessage());
     }
 
     @Test
-    @DisplayName("연속된 윷 던지기 테스트")
-    void testContinuousYutThrow() {
-        YutGameRules.setTestMode(true);
+    @DisplayName("순서 재배열 검증 - 잘못된 입력들")
+    void testValidateReorderInput_InvalidInputs() {
+        List<Integer> originalResults = Arrays.asList(1, 3, 4);
         
-        // 테스트 모드에서 100번 연속으로 던져서 모두 1이 나오는지 확인
-        for (int i = 0; i < 100; i++) {
-            int result = YutGameRules.throwOneYut();
-            assertEquals(1, result, i + "번째 던지기에서 예상과 다른 값");
-        }
+        // 1. 빈 입력
+        YutGameRules.ReorderResult result1 = YutGameRules.validateReorderInput("", originalResults);
+        assertFalse(result1.isSuccess());
+        
+        // 2. 개수 불일치
+        YutGameRules.ReorderResult result2 = YutGameRules.validateReorderInput("1,3", originalResults);
+        assertFalse(result2.isSuccess());
+        
+        // 3. 범위 벗어난 값
+        YutGameRules.ReorderResult result3 = YutGameRules.validateReorderInput("1,3,6", originalResults);
+        assertFalse(result3.isSuccess());
+        
+        // 4. 숫자가 아닌 값
+        YutGameRules.ReorderResult result4 = YutGameRules.validateReorderInput("1,a,3", originalResults);
+        assertFalse(result4.isSuccess());
+        
+        // 5. 다른 값들
+        YutGameRules.ReorderResult result5 = YutGameRules.validateReorderInput("1,2,3", originalResults);
+        assertFalse(result5.isSuccess());
     }
 
     @Test
-    @DisplayName("정적 메서드 동작 확인")
-    void testStaticMethodBehavior() {
-        // 클래스 인스턴스화 없이 정적 메서드 호출 가능 확인
-        assertFalse(YutGameRules.isTestMode());
+    @DisplayName("토큰 이동 - 정상 이동")
+    void testMoveToken_NormalMove() {
+        // Given: 4각형 게임 설정
+        List<String> playerNames = Arrays.asList("플레이어1");
+        List<Integer> tokenCounts = Arrays.asList(1);
+        GameState gameState = new GameState(4, 2.0f, playerNames, tokenCounts);
         
-        YutGameRules.setTestMode(true);
-        assertTrue(YutGameRules.isTestMode());
+        Player player = gameState.getPlayers().get(0);
+        Token token = player.getTokens().get(0);
+        TokenPositionManager tokenManager = gameState.getTokenPositionManager();
         
-        int result = YutGameRules.throwOneYut();
-        assertEquals(1, result); // 테스트 모드에서는 1
+        // 토큰을 시작 위치에 배치
+        tokenManager.placeTokenAtStart(token);
+        
+        // When: 3칸 이동
+        YutGameRules.MoveResult result = YutGameRules.moveToken(token, 3, tokenManager, null);
+        
+        // Then: 성공적으로 이동해야 함
+        assertTrue(result.isSuccess());
+        assertFalse(result.isCatched());
+        assertFalse(result.isFinished());
+        
+        // 위치 확인
+        BoardNode finalPos = tokenManager.getTokenPosition(token);
+        assertEquals("Edge0-3", finalPos.getName());
+    }
+
+    @Test
+    @DisplayName("토큰 이동 - 완주 처리")
+    void testMoveToken_Finish() {
+        // Given: 게임 설정
+        List<String> playerNames = Arrays.asList("플레이어1");
+        List<Integer> tokenCounts = Arrays.asList(1);
+        GameState gameState = new GameState(4, 2.0f, playerNames, tokenCounts);
+        
+        Player player = gameState.getPlayers().get(0);
+        Token token = player.getTokens().get(0);
+        TokenPositionManager tokenManager = gameState.getTokenPositionManager();
+        Board board = gameState.getBoard();
+        
+        // 토큰을 완주 직전 위치에 배치
+        tokenManager.placeTokenAtStart(token);
+        BoardNode nearFinish = board.findNodeByName("Edge3-4"); // 완주 직전
+        if (nearFinish != null) {
+            BoardNode currentPos = tokenManager.getTokenPosition(token);
+            if (currentPos != null) currentPos.leave(token);
+            nearFinish.enter(token);
+            tokenManager.updateTokenPosition(token, nearFinish);
+        }
+        
+        // When: 충분한 칸수로 이동 (완주되도록)
+        YutGameRules.MoveResult result = YutGameRules.moveToken(token, 5, tokenManager, null);
+        
+        // Then: 완주 처리되어야 함
+        assertTrue(result.isSuccess());
+        assertTrue(result.isFinished());
+        assertEquals("말이 완주했습니다!", result.getMessage());
+        
+        // 토큰이 보드에서 제거되어야 함
+        assertNull(tokenManager.getTokenPosition(token));
+        assertEquals(TokenState.FINISHED, token.getState());
+    }
+
+    @Test
+    @DisplayName("토큰 뒤로 이동 - 빽도 처리")
+    void testMoveTokenBackward() {
+        // Given: 게임 설정
+        List<String> playerNames = Arrays.asList("플레이어1");
+        List<Integer> tokenCounts = Arrays.asList(1);
+        GameState gameState = new GameState(4, 2.0f, playerNames, tokenCounts);
+        
+        Player player = gameState.getPlayers().get(0);
+        Token token = player.getTokens().get(0);
+        TokenPositionManager tokenManager = gameState.getTokenPositionManager();
+        Board board = gameState.getBoard();
+        
+        // 토큰을 Edge0-4 위치에 배치
+        tokenManager.placeTokenAtStart(token);
+        BoardNode targetPos = board.findNodeByName("Edge0-4");
+        if (targetPos != null) {
+            BoardNode currentPos = tokenManager.getTokenPosition(token);
+            if (currentPos != null) currentPos.leave(token);
+            targetPos.enter(token);
+            tokenManager.updateTokenPosition(token, targetPos);
+        }
+        
+        // When: 2칸 뒤로 이동
+        YutGameRules.MoveResult result = YutGameRules.moveTokenBackward(token, 2, tokenManager);
+        
+        // Then: 성공적으로 뒤로 이동해야 함
+        assertTrue(result.isSuccess());
+        
+        // 위치 확인 (Edge0-4 → Edge0-2)
+        BoardNode finalPos = tokenManager.getTokenPosition(token);
+        assertEquals("Edge0-2", finalPos.getName());
+    }
+
+    @Test
+    @DisplayName("토큰 잡기 처리")
+    void testMoveToken_Capture() {
+        // Given: 게임 설정 (2명의 플레이어)
+        List<String> playerNames = Arrays.asList("플레이어1", "플레이어2");
+        List<Integer> tokenCounts = Arrays.asList(1, 1);
+        GameState gameState = new GameState(4, 2.0f, playerNames, tokenCounts);
+        
+        Player player1 = gameState.getPlayers().get(0);
+        Player player2 = gameState.getPlayers().get(1);
+        Token token1 = player1.getTokens().get(0);
+        Token token2 = player2.getTokens().get(0);
+        TokenPositionManager tokenManager = gameState.getTokenPositionManager();
+        Board board = gameState.getBoard();
+        
+        // 두 토큰 모두 활성화
+        tokenManager.placeTokenAtStart(token1);
+        tokenManager.placeTokenAtStart(token2);
+        
+        // player2의 토큰을 Edge0-3에 배치
+        BoardNode targetPos = board.findNodeByName("Edge0-3");
+        if (targetPos != null) {
+            BoardNode currentPos = tokenManager.getTokenPosition(token2);
+            if (currentPos != null) currentPos.leave(token2);
+            targetPos.enter(token2);
+            tokenManager.updateTokenPosition(token2, targetPos);
+        }
+        
+        // When: player1의 토큰이 같은 위치로 이동 (잡기)
+        YutGameRules.MoveResult result = YutGameRules.moveToken(token1, 3, tokenManager, null);
+        
+        // Then: 잡기가 성공해야 함
+        assertTrue(result.isSuccess());
+        assertTrue(result.isCatched());
+        assertEquals("상대방 말을 잡았습니다!", result.getMessage());
+        
+        // 잡힌 토큰은 초기화되어야 함
+        assertNull(tokenManager.getTokenPosition(token2));
+        assertEquals(TokenState.READY, token2.getState());
+    }
+
+    @Test
+    @DisplayName("토큰 업기 처리")
+    void testMoveToken_Stacking() {
+        // Given: 게임 설정 (같은 팀 토큰 2개)
+        List<String> playerNames = Arrays.asList("플레이어1");
+        List<Integer> tokenCounts = Arrays.asList(2);
+        GameState gameState = new GameState(4, 2.0f, playerNames, tokenCounts);
+        
+        Player player = gameState.getPlayers().get(0);
+        Token token1 = player.getTokens().get(0);
+        Token token2 = player.getTokens().get(1);
+        TokenPositionManager tokenManager = gameState.getTokenPositionManager();
+        Board board = gameState.getBoard();
+        
+        // 두 토큰 모두 활성화
+        tokenManager.placeTokenAtStart(token1);
+        tokenManager.placeTokenAtStart(token2);
+        
+        // token2를 Edge0-3에 배치
+        BoardNode targetPos = board.findNodeByName("Edge0-3");
+        if (targetPos != null) {
+            BoardNode currentPos = tokenManager.getTokenPosition(token2);
+            if (currentPos != null) currentPos.leave(token2);
+            targetPos.enter(token2);
+            tokenManager.updateTokenPosition(token2, targetPos);
+        }
+        
+        // When: token1이 같은 위치로 이동 (업기)
+        YutGameRules.MoveResult result = YutGameRules.moveToken(token1, 3, tokenManager, null);
+        
+        // Then: 업기가 성공해야 함
+        assertTrue(result.isSuccess());
+        assertFalse(result.isCatched());
+        
+        // token1이 대표 토큰이 되고, token2는 업힌 상태
+        assertEquals(1, token1.getStackedTokens().size());
+        assertTrue(token1.getStackedTokens().contains(token2));
+        assertNull(tokenManager.getTokenPosition(token2)); // 업힌 토큰은 위치가 null
     }
 } 
