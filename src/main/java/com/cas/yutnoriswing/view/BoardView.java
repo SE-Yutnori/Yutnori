@@ -151,15 +151,14 @@ public class BoardView extends JPanel {
                 g2d.drawString("start", textX, textY);
             }
             
-            // 모든 노드의 이름 표시 - 주석 처리하여 노드 이름 숨김
-            /*
-            g2d.setFont(new Font("Arial", Font.PLAIN, 10));
-            g2d.setColor(Color.BLUE);
-            FontMetrics fm = g2d.getFontMetrics();
-            int nameX = x - fm.stringWidth(name) / 2; // 텍스트 중앙 정렬
-            int nameY = y + (isImportantNode ? out/2 + 15 : radius/2 + 15);
-            g2d.drawString(name, nameX, nameY);
-            */
+            // // 각 BoardNode의 이름 표시하는 코드들.. 디버깅용.. 추후 삭제 예정           
+            // g2d.setFont(new Font("Arial", Font.PLAIN, 10));
+            // g2d.setColor(Color.BLUE);
+            // FontMetrics fm = g2d.getFontMetrics();
+            // int nameX = x - fm.stringWidth(node.getName()) / 2; // 텍스트 중앙 정렬
+            // int nameY = y + (isImportantNode ? out/2 + 15 : radius/2 + 15);
+            // g2d.drawString(node.getName(), nameX, nameY);
+            
         }
 
         // 말 표시

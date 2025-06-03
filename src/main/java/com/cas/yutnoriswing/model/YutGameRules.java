@@ -475,34 +475,34 @@ public class YutGameRules {
                     // nextNodes에서 직진 경로 찾기
                     for (BoardNode node : nextNodes) {
                         if (node.getName().equals(targetName)) {
-                            // 디버깅 정보
-                            System.out.println("[DEBUG] 4각형 직진: " + previousName + " → " + targetName);
                             return node;
                         }
                     }
                     
-                    // 직진 경로를 찾지 못한 경우 (이론적으로 발생하지 않아야 함)
-                    System.out.println("[WARNING] 4각형에서 직진 경로를 찾지 못함: " + previousName + " → " + targetName);
-                    
                 } catch (NumberFormatException e) {
-                    System.out.println("[ERROR] 이전 노드 인덱스 파싱 실패: " + previousName);
                 }
             } else {
-                System.out.println("[WARNING] 예상하지 못한 이전 노드 형식: " + previousName);
             }
         } else {
-            // 5각형/6각형: 무조건 goal(ToCenter0-2)이 아닌 경로 선택
-            for (BoardNode node : nextNodes) {
-                if (!node.getName().equals("ToCenter0-2")) {
-                    System.out.println("[DEBUG] " + sides + "각형 기본 경로: " + node.getName() + " (goal 아닌 경로)");
-                    return node;
+            // 5각형/6각형: 보드 타입별 기본 경로 선택
+            if (sides == 6) {
+                // 6각형: 항상 ToCenter5-2 방향으로 나감
+                for (BoardNode node : nextNodes) {
+                    if (node.getName().equals("ToCenter5-2")) {
+                        return node;
+                    }
+                }
+            } else {
+                // 5각형: goal(ToCenter0-2)이 아닌 경로 선택
+                for (BoardNode node : nextNodes) {
+                    if (!node.getName().equals("ToCenter0-2")) {
+                        return node;
+                    }
                 }
             }
-            System.out.println("[WARNING] " + sides + "각형에서 goal이 아닌 경로를 찾지 못함");
         }
         
         // fallback: 첫 번째 옵션
-        System.out.println("[FALLBACK] 기본 경로 선택: " + nextNodes.get(0).getName());
         return nextNodes.get(0);
     }
 

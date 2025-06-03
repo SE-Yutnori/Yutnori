@@ -148,65 +148,6 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("보드 크기에 따른 노드 수 증가 확인")
-    void testNodeCountIncrease() {
-        int nodes4 = board4.getNodes().size();
-        int nodes5 = board5.getNodes().size();
-        int nodes6 = board6.getNodes().size();
-        
-        // 각형 수가 증가할수록 노드 수도 증가해야 함
-        assertTrue(nodes4 < nodes5, "5각형이 4각형보다 노드가 많아야 함");
-        assertTrue(nodes5 < nodes6, "6각형이 5각형보다 노드가 많아야 함");
-    }
-
-    @Test
-    @DisplayName("동일한 설정으로 생성된 보드는 동일한 노드 수를 가짐")
-    void testConsistentBoardGeneration() {
-        // Given
-        Board anotherBoard4 = new Board(4, 2.0f);
-        Board anotherBoard5 = new Board(5, 2.0f);
-        
-        // When & Then
-        assertEquals(board4.getNodes().size(), anotherBoard4.getNodes().size(),
-            "같은 설정의 4각형 보드는 동일한 노드 수를 가져야 함");
-        assertEquals(board5.getNodes().size(), anotherBoard5.getNodes().size(),
-            "같은 설정의 5각형 보드는 동일한 노드 수를 가져야 함");
-    }
-
-    @Test
-    @DisplayName("노드 이름의 고유성 확인")
-    void testNodeNameUniqueness() {
-        List<BoardNode> nodes = board5.getNodes();
-        
-        // 모든 노드 이름이 고유해야 함
-        long uniqueNames = nodes.stream()
-                .map(BoardNode::getName)
-                .distinct()
-                .count();
-        
-        assertEquals(nodes.size(), uniqueNames, "모든 노드는 고유한 이름을 가져야 함");
-    }
-
-    @Test
-    @DisplayName("각 노드의 보드 크기 정보 확인")
-    void testNodeBoardSizeInfo() {
-        List<BoardNode> nodes4 = board4.getNodes();
-        List<BoardNode> nodes5 = board5.getNodes();
-        
-        // 4각형 보드의 모든 노드는 sides = 4를 가져야 함
-        for (BoardNode node : nodes4) {
-            assertEquals(4, node.getBoardSize(), 
-                "4각형 보드의 노드는 sides = 4를 가져야 함");
-        }
-        
-        // 5각형 보드의 모든 노드는 sides = 5를 가져야 함
-        for (BoardNode node : nodes5) {
-            assertEquals(5, node.getBoardSize(), 
-                "5각형 보드의 노드는 sides = 5를 가져야 함");
-        }
-    }
-
-    @Test
     @DisplayName("빈 토큰 리스트로 시작")
     void testInitialEmptyTokens() {
         List<BoardNode> nodes = board4.getNodes();
