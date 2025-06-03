@@ -1,0 +1,53 @@
+@startuml
+control GameController
+entity GameState
+entity TokenPositionManager
+entity Token
+entity BoardNode
+boundary InGameView
+entity MoveResult
+entity Player
+
+== 1. 저장된 이동 순서 조회 ==
+GameController -> GameState: getRemainingMoves()
+activate GameState
+GameState --> GameController: remainingMoves
+deactivate GameState
+
+== 2. 다음 이동(step) 꺼내기 ==
+GameController -> GameController: step = remainingMoves.remove(0)
+
+== 3. 이동할 토큰 목록 조회 ==
+GameController -> GameState: getMovableTokens(step)
+activate GameState
+GameState --> GameController: availableTokens
+deactivate GameState
+
+alt availableTokens.isEmpty()
+    GameController -> InGameView: showError("이동할 말이 없습니다.")
+    GameController -> GameController: goto "남은 이동 검사"
+else
+    GameController -> InGameView: promptSelectToken(availableTokens)
+    activate InGameView
+    InGameView --> GameController: selectedToken
+    deactivate InGameView
+end
+
+== 4. 선택된 토큰 실제 이동 ==
+alt selectedToken != null
+    GameController -> GameState: moveToken(selectedToken, step, gameState.getTokenPositionManager(), options -> InGameView.promptSelectPath(options))
+    activate GameState
+    GameState --> GameController: moveResult
+    deactivate GameState
+    GameController -> InGameView: refreshBoard()
+end
+
+== 5. 남은 이동(remainingMoves) 검사 ==
+alt remainingMoves.isEmpty() == false
+    GameController -> InGameView: showMessage("다음 " + remainingMoves.get(0) + "칸 이동하세요.")
+    GameController -> GameController:
+else
+    GameController -> GameController: endTurn()
+end
+
+@enduml
