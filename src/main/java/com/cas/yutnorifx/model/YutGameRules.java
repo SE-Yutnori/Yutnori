@@ -339,43 +339,7 @@ public class YutGameRules {
             return nextNodes.get(0);
         }
 
-        int sides = nextNodes.get(0).getBoardSize();
-
-        if (sides == 4) {
-            // 4각형: 이전 노드 방향을 고려해서 직진 방향 선택
-            // 보드 구조: ToCenter1-2(오른쪽), ToCenter2-2(아래) → Center → ToCenter0-2(위), ToCenter3-2(왼쪽)
-            String previousName = previousNode.getName();
-
-            if (previousName.startsWith("ToCenter") && previousName.endsWith("-2")) {
-                try {
-                    // 이전 노드에서 인덱스 추출 (ToCenter{index}-2)
-                    String indexStr = previousName.substring(8, previousName.length() - 2);
-                    int fromIndex = Integer.parseInt(indexStr);
-
-                    // 직진 매핑:
-                    // ToCenter1-2 (오른쪽에서 들어옴) → ToCenter3-2 (왼쪽으로 나감)
-                    // ToCenter2-2 (아래에서 들어옴) → ToCenter0-2 (위로 나감)
-                    int toIndex = (fromIndex + 2) % 4;
-                    String targetName = "ToCenter" + toIndex + "-2";
-
-                    // nextNodes에서 직진 경로 찾기
-                    for (BoardNode node : nextNodes) {
-                        if (node.getName().equals(targetName)) {
-                            return node;
-                        }
-                    }
-
-                } catch (NumberFormatException e) {
-                }
-            } else {
-            }
-        } else {
-            //중앙 분기 진입 로직
-            return nextNodes.get(nextNodes.size() - 1);
-        }
-
-        // fallback: 첫 번째 옵션
-        return nextNodes.get(0);
+        return nextNodes.get(nextNodes.size() - 1);
     }
 
     private static boolean handleCaptureAndStacking(Token token, BoardNode node, TokenPositionManager tokenManager) {
