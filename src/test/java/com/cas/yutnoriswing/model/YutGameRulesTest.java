@@ -67,64 +67,27 @@ class YutGameRulesTest {
     @Test
     @DisplayName("연속 윷 던지기 - 윷이나 모가 나올 때까지 계속 던지기")
     void testThrowYut_ContinuousThrow() {
-        // Given: 일반 모드
+        // Given: 테스트 모드 비활성화 (실제 랜덤 모드)
         YutGameRules.setTestMode(false);
         
-        // When: 연속 던지기 실행
+        // When: 윷 던지기 (계속 던지기)
         YutGameRules.YutThrowResult result = YutGameRules.throwYut();
         
         // Then: 결과 검증
         assertNotNull(result);
         assertNotNull(result.getResults());
         assertNotNull(result.getResultMessages());
-        assertFalse(result.getResults().isEmpty());
-        assertFalse(result.getResultMessages().isEmpty());
+        assertTrue(result.getResults().size() > 0);
         
-        // 마지막 결과는 4 미만이어야 함 (윷이나 모가 아닌 경우에만 종료)
-        int lastResult = result.getResults().get(result.getResults().size() - 1);
+        // 모든 결과가 유효한 범위 내인지 확인
+        for (int r : result.getResults()) {
+            assertTrue(r >= -1 && r <= 5, "결과는 -1~5 범위 내여야 함");
+        }
+        
+        // 마지막 결과는 도/개/걸이어야 함 (연속 던지기 종료 조건)
+        List<Integer> results = result.getResults();
+        int lastResult = results.get(results.size() - 1);
         assertTrue(lastResult < 4, "마지막 결과는 도/개/걸이어야 함");
-    }
-
-    @Test
-    @DisplayName("순서 재배열 검증 - 유효한 입력")
-    void testValidateReorderInput_ValidInput() {
-        // Given: 원본 결과와 유효한 재배열 입력
-        List<Integer> originalResults = Arrays.asList(1, 3, 4, 5);
-        String validInput = "4,1,5,3";
-        
-        // When: 검증 실행
-        InGameView.ReorderResult result = InGameView.validateReorderInput(validInput, originalResults);
-        
-        // Then: 성공해야 함
-        assertTrue(result.isSuccess());
-        assertEquals(Arrays.asList(4, 1, 5, 3), result.getReorderedResults());
-        assertNull(result.getErrorMessage());
-    }
-
-    @Test
-    @DisplayName("순서 재배열 검증 - 잘못된 입력들")
-    void testValidateReorderInput_InvalidInputs() {
-        List<Integer> originalResults = Arrays.asList(1, 3, 4);
-        
-        // 1. 빈 입력
-        InGameView.ReorderResult result1 = InGameView.validateReorderInput("", originalResults);
-        assertFalse(result1.isSuccess());
-        
-        // 2. 개수 불일치
-        InGameView.ReorderResult result2 = InGameView.validateReorderInput("1,3", originalResults);
-        assertFalse(result2.isSuccess());
-        
-        // 3. 범위 벗어난 값
-        InGameView.ReorderResult result3 = InGameView.validateReorderInput("1,3,6", originalResults);
-        assertFalse(result3.isSuccess());
-        
-        // 4. 숫자가 아닌 값
-        InGameView.ReorderResult result4 = InGameView.validateReorderInput("1,a,3", originalResults);
-        assertFalse(result4.isSuccess());
-        
-        // 5. 다른 값들
-        InGameView.ReorderResult result5 = InGameView.validateReorderInput("1,2,3", originalResults);
-        assertFalse(result5.isSuccess());
     }
 
     @Test

@@ -18,7 +18,7 @@ class TokenTest {
     @BeforeEach
     void setUp() {
         owner = new Player("테스트플레이어", 3);
-        token = new Token("테스트토큰", owner);
+        token = new Token("테스트말", owner);
         
         // 테스트용 BoardNode 생성
         node1 = new BoardNode("TestNode1", 100.0f, 100.0f, 4);
@@ -29,10 +29,10 @@ class TokenTest {
     @DisplayName("Token 생성자 테스트")
     void testTokenConstructor() {
         // Given & When
-        Token newToken = new Token("새토큰", owner);
+        Token newToken = new Token("새말", owner);
         
         // Then
-        assertEquals("새토큰", newToken.getName());
+        assertEquals("새말", newToken.getName());
         assertEquals(owner, newToken.getOwner());
         assertEquals(TokenState.READY, newToken.getState());
         assertTrue(newToken.getStackedTokens().isEmpty());
@@ -60,8 +60,8 @@ class TokenTest {
     @DisplayName("업힌 말 추가/제거 테스트")
     void testStackedTokenManagement() {
         // Given
-        Token stackedToken1 = new Token("스택토큰1", owner);
-        Token stackedToken2 = new Token("스택토큰2", owner);
+        Token stackedToken1 = new Token("업힌말1", owner);
+        Token stackedToken2 = new Token("업힌말2", owner);
         
         // When: 스택 토큰 추가
         token.addStackedToken(stackedToken1);
@@ -93,8 +93,8 @@ class TokenTest {
     @DisplayName("업힌 말 전체 제거 테스트")
     void testClearStackedTokens() {
         // Given
-        Token stackedToken1 = new Token("스택토큰1", owner);
-        Token stackedToken2 = new Token("스택토큰2", owner);
+        Token stackedToken1 = new Token("업힌말1", owner);
+        Token stackedToken2 = new Token("업힌말2", owner);
         token.addStackedToken(stackedToken1);
         token.addStackedToken(stackedToken2);
         
@@ -200,11 +200,10 @@ class TokenTest {
     @DisplayName("Token 불변 속성 테스트")
     void testTokenImmutableProperties() {
         // Given & When & Then
-        assertEquals("테스트토큰", token.getName());
+        assertEquals("테스트말", token.getName());
         assertEquals(owner, token.getOwner());
         
         // 이름과 소유자는 생성 후 변경할 수 없어야 함 (final 필드)
-        // 컴파일 타임에 검증되므로 런타임 테스트 불가
     }
 
     @Test
