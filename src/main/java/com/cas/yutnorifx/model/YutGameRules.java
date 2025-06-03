@@ -339,6 +339,27 @@ public class YutGameRules {
             return nextNodes.get(0);
         }
 
+        // 보드 크기에 따른 처리
+        int boardSides = tokenManager.getBoard().getSides();
+        
+        if (boardSides == 4) {
+            // 4각형: 직진 로직 - 들어온 방향의 반대편으로 나가기
+            String previousName = previousNode.getName();
+            
+            if (previousName.startsWith("ToCenter") && previousName.endsWith("-2")) {
+                // ToCenter{숫자}-2에서 들어온 경우, 반대편 ToCenter로 나가기
+                int incomingIndex = Integer.parseInt(previousName.substring(8, 9)); // "ToCenter2-2"에서 "2" 추출
+                int outgoingIndex = (incomingIndex + 2) % 4; // 4각형에서 직진은 +2
+                
+                String targetPrefix = "ToCenter" + outgoingIndex;
+                return nextNodes.stream()
+                    .filter(node -> node.getName().startsWith(targetPrefix))
+                    .findFirst()
+                    .orElse(nextNodes.get(0));
+            }
+        }
+        
+        // 5각형, 6각형: 기존 로직 (마지막 선택지)
         return nextNodes.get(nextNodes.size() - 1);
     }
 

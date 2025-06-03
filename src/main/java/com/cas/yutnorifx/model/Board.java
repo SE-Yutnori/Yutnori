@@ -128,6 +128,10 @@ public class Board {
         return startNode;
     }
 
+    public int getSides() {
+        return sides;
+    }
+
     public BoardNode findNodeByName(String nodeName) {
         return nodes.stream()
                 .filter(node -> nodeName.equals(node.getName()))
