@@ -1,0 +1,33 @@
+@startuml
+participant InGameView
+participant GameController
+participant GameState
+participant Player
+participant YutGameRules
+participant YutThrowResult
+
+== 윷 던지기 시작 및 누적 던지기 ==
+InGameView -> GameController: rollingYut()
+note right: 사용자가 "윷 던지기" 버튼 클릭
+activate GameController
+
+GameController -> GameState: getCurrentPlayer()
+note right: 현재 차례인 Player 객체 반환
+activate GameState
+
+GameState --> GameController: currentPlayer
+note left: Player
+deactivate GameState
+
+GameController -> YutGameRules: accumulateYut(currentPlayer)
+note right: 윷 던지기 누적 로직
+activate YutGameRules
+
+YutGameRules --> GameController: YutThrowResult(resultList, messageList)
+note left: resultList \n messageList
+deactivate YutGameRules
+
+GameController -> InGameView: showYutThrowMessages(messageList)
+note right: 텍스트 순차적으로 표시
+deactivate GameController
+@enduml
