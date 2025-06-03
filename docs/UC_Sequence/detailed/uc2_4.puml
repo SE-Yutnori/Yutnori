@@ -1,0 +1,56 @@
+@startuml
+boundary GameController
+boundary InGameView
+entity GameState
+entity TokenPositionManager
+entity BoardView
+
+== 보드 상태 갱신 및 재렌더링 ==
+YutGameRules --> GameController: MoveResult result
+note left: 이동 결과(success, caught, finished, message) 전달
+activate GameController
+
+GameController -> GameState: updateTurnOrder()
+note right: 다음 플레이어로 턴 변경(또는 추가 턴 부여)
+GameController -> InGameView: refresh()
+note right: InGameView.refresh() 호출 → 내부 BoardView.refresh() 실행
+
+InGameView -> BoardView: refresh()
+note right: Canvas 초기화 후 보드·토큰 그리기 시작
+activate BoardView
+
+BoardView -> Canvas: clearRect(0, 0, width, height)
+note right: 이전 프레임 지우기
+
+BoardView -> GraphicsContext: setFill(Color.WHITE)
+BoardView -> GraphicsContext: fillRect(0, 0, width, height)
+note right: 배경 흰색으로 채우기
+
+loop 모든 BoardNode 순회
+    BoardView -> GraphicsContext: strokeLine(x1, y1, x2, y2)
+    note right: 각 노드의 연결선 그리기
+    BoardView -> GraphicsContext: strokeOval(drawX, drawY, outer, outer)
+    BoardView -> GraphicsContext: fillOval(drawX, drawY, inner, inner)
+    note right: 노드 원형(외곽선·채우기) 및 레이블 그리기
+end
+
+loop 모든 Player 순회
+    loop 해당 Player의 Token 순회
+        TokenPositionManager -> BoardNode: getTokenPosition(token)
+        note right: 토큰 현재 위치 조회
+        BoardView -> GraphicsContext: setFill(playerColor)
+        BoardView -> GraphicsContext: fillOval(tokenX - r, tokenY - r, diameter, diameter)
+        note right: 토큰 원형으로 그리기
+        alt 토큰이 다른 토큰과 스택된 경우
+            BoardView -> GraphicsContext: strokeText(stackCount, tokenX, tokenY)
+            note right: 스택된 수 표시
+        end
+    end
+end
+
+deactivate BoardView
+
+GameController --> InGameView: showMessage(result.getMessage())
+note left: 필요 시 이동 결과 메시지 표시
+deactivate GameController
+@enduml
