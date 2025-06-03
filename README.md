@@ -1,17 +1,16 @@
-# 🎯 윷놀이 게임 (YutnoriFX ver3)
+# 윷놀이 게임
 
-한국 전통 보드게임 윷놀이를 JavaFX와 Swing으로 구현한 멀티 UI 지원 게임입니다.
+윷놀이를 JavaFX와 Swing으로 구현한 멀티 UI를 지원해주는 게임입니다.
 
-## ✨ 주요 특징
+## 주요 특징
 
 - **멀티 UI 지원**: JavaFX와 Swing 중 선택 가능
 - **동적 크기 조정**: 창 크기에 맞게 보드가 자동으로 스케일링
-- **완전한 윷놀이 규칙**: 말 잡기, 업기, 분기 선택, 추가 턴 등 모든 규칙 구현
+- **윷놀이 규칙**: 말 잡기, 업기, 분기 선택, 추가 턴 등 모든 규칙 구현
 - **테스트 모드**: 원하는 윷 결과를 선택할 수 있는 디버그 모드
 - **커스터마이징**: 4-6각형 보드, 2-4명 플레이어, 2-5개 말 설정 가능
-- **엔터프라이즈급 아키텍처**: MVC + Observer 패턴 적용
 
-## 🏗️ 아키텍처 설계 원리
+## 아키텍처 설계 원리
 
 ### 왜 Model과 Controller는 그대로 두고 View만 바꿀 수 있는가?
 
@@ -44,14 +43,9 @@ public void onGameEvent(GameEvent event) {
 
 Model은 View가 JavaFX인지 Swing인지 전혀 알지 못합니다. 단순히 이벤트를 발행할 뿐이고, View는 관찰자로서 이벤트를 수신하여 적절히 화면을 업데이트합니다.
 
-### 전체 비즈니스 로직 흐름 (이벤트 기반 아키텍처)
+### 전체 로직 흐름 (이벤트 기반)
 
-#### 1. **게임 초기화 과정**
-```
-User Input → Launcher → GameState 생성 → Observer 등록 → 게임 시작
-```
-
-#### 2. **게임 진행 과정 (이벤트 중심)**
+#### 1. **게임 진행 과정 (이벤트 중심)**
 ```mermaid
 graph TB
     A[사용자: 윷 던지기 버튼 클릭] --> B[View: Controller에 액션 전달]
@@ -68,7 +62,7 @@ graph TB
     L --> M[View: 보드 상태 자동 업데이트]
 ```
 
-#### 3. **핵심 이벤트 타입별 처리**
+#### 2. **핵심 이벤트 타입별 처리**
 ```java
 // Model에서 발생하는 주요 이벤트들
 public enum EventType {
@@ -84,7 +78,7 @@ public enum EventType {
 }
 ```
 
-#### 4. **비동기 요청-응답 시스템**
+#### 3. **비동기 요청-응답 시스템**
 ```java
 // Model → View 요청 (CompletableFuture 기반)
 CompletableFuture<TokenSelectionResponse> future = new CompletableFuture<>();
@@ -96,7 +90,7 @@ view.setOnTokenSelection(response -> {
 });
 ```
 
-#### 5. **멀티 UI 지원의 핵심 원리**
+#### 5. **멀티 UI 지원**
 ```java
 // GameState.java (Model) - UI에 무관한 순수 비즈니스 로직
 public class GameState extends GameEventNotifier {
@@ -123,15 +117,7 @@ public class SwingInGameView implements GameEventObserver {
 }
 ```
 
-### 아키텍처의 장점
-
-1. **확장성**: 새로운 UI 프레임워크 (예: Web, Mobile) 추가 시 View만 구현하면 됨
-2. **유지보수성**: 게임 규칙 변경 시 Model만 수정하면 모든 UI에 자동 반영
-3. **테스트 용이성**: Model과 Controller는 UI와 독립적으로 테스트 가능
-4. **재사용성**: 동일한 게임 로직을 다양한 플랫폼에서 재사용
-5. **느슨한 결합**: 각 계층이 독립적으로 개발 및 수정 가능
-
-## 🚀 실행 방법
+## 실행 방법
 
 ### 기본 실행 (JavaFX 모드)
    ```bash
@@ -143,7 +129,7 @@ public class SwingInGameView implements GameEventObserver {
 ./gradlew run -Dui=swing
 ```
 
-## 🔨 빌드 방법
+## 빌드 방법
 
 ### 프로젝트 빌드
 ```bash
@@ -160,9 +146,9 @@ public class SwingInGameView implements GameEventObserver {
 ./gradlew test
 ```
 
-## 🎮 게임 규칙
+## 게임 규칙
 
-### 기본 규칙
+### 윷놀이 규칙
 - **목표**: 모든 말을 상대방보다 먼저 도착시키기
 - **윷 결과**: 빽도(-1), 도(1), 개(2), 걸(3), 윷(4), 모(5)
 - **추가 턴**: 윷(4), 모(5), 상대 말 잡기 시 추가 턴 획득
@@ -172,7 +158,7 @@ public class SwingInGameView implements GameEventObserver {
 - **말 업기**: 같은 팀 말이 있는 곳에 도착하면 함께 이동
 - **분기 선택**: 여러 경로가 있는 노드에서 방향 선택 가능
 
-## 🛠️ 기술 스택
+## 🛠기술 스택
 
 - **언어**: Java 23
 - **UI 프레임워크**: JavaFX, Swing
@@ -180,7 +166,7 @@ public class SwingInGameView implements GameEventObserver {
 - **아키텍처**: MVC + Observer Pattern
 - **동시성**: CompletableFuture를 이용한 비동기 처리
 
-## 📁 프로젝트 구조
+## 프로젝트 구조
 
 ```
 src/main/java/com/cas/yutnorifx/
@@ -204,7 +190,7 @@ src/main/java/com/cas/yutnorifx/
     └── GameEndChoice.java        # 공통 enum
 ```
 
-## ⚙️ 설정 옵션
+## 설정 가능 옵션
 
 ### 게임 설정
 - **보드 각형**: 4각형, 5각형, 6각형 (권장: 4-6)
@@ -216,25 +202,10 @@ src/main/java/com/cas/yutnorifx/
 - **JavaFX**: 현대적이고 부드러운 UI (권장)
 - **Swing**: 클래식한 UI, 더 넓은 호환성
 
-## 🎯 게임 플레이 가이드
+## 게임 플레이 가이드
 
 1. **게임 시작**: 보드 각형, 플레이어 정보, 테스트 모드 설정
 2. **윷 던지기**: "윷 던지기" 버튼 클릭
 3. **말 선택**: 이동할 말을 선택 (여러 말이 있는 경우)
 4. **분기 선택**: 여러 경로가 있는 노드에서 방향 선택
 5. **승리 조건**: 모든 말을 먼저 도착시키는 플레이어가 승리
-
-## 🔧 개발자 정보
-
-- **아키텍처**: Model-View-Controller + Observer Pattern
-- **비동기 처리**: CompletableFuture 기반 요청/응답 시스템
-- **UI 바인딩**: Observer 패턴으로 Model-View 자동 동기화
-- **확장성**: 새로운 UI 프레임워크 추가 용이
-
-## 📝 라이선스
-
-이 프로젝트는 교육 목적으로 제작되었습니다.
-
----
-
-**즐거운 윷놀이 되세요! 🎲**
