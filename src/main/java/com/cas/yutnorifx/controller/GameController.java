@@ -3,7 +3,7 @@ package com.cas.yutnorifx.controller;
 import com.cas.yutnorifx.model.core.GameState;
 import com.cas.yutnorifx.model.request.*;
 import com.cas.yutnorifx.view.GameEndChoice;
-
+//test
 //Observer 패턴 적용을 간소화된 Controller <- 기존에는 Controller의 비중이 큰 전통적인 MVC 패턴이었음.
 //Model의 상태 변화는 Observer를 통해 View에 자동 전달되게 함.
 //Controller는 단순히 사용자 액션을 Model에 전달하는 역할만 수행
