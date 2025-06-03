@@ -1,0 +1,30 @@
+@startuml
+entity InGameView
+entity BoardView
+entity GameController
+entity GameState
+
+== BoardView 생성 및 초기 그리기 요청 ==
+InGameView -> BoardView: new BoardView(boardNodes, players)
+note right: `BoardView(List<BoardNode>, List<Player>)` 생성자 호출
+activate BoardView
+
+BoardView -> GameState: (간접적으로) gameState.getBoard(), gameState.getPlayers()
+note right: 생성자 내부에서 참조 저장
+
+BoardView -> BoardView: refresh()
+note right: `refresh()` → `paintComponent()` 호출
+
+activate BoardView
+
+BoardView -> BoardNode: getNextNodes(), getX(), getY() 반복
+note right: 노드 간 연결선, 분기선 그리기
+
+BoardView -> BoardNode: drawOval, drawArrowHead 등
+note right: 노드(원) 및 레이블 그리기
+
+BoardView -> Player: getTokens() 반복 → Token.getCurrentNode()
+note right: 토큰 위치 정보 조회 후 토큰 아이콘 그리기
+
+deactivate BoardView
+@enduml

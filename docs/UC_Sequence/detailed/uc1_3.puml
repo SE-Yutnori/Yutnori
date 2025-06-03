@@ -1,0 +1,26 @@
+@startuml
+boundary GameLauncher
+entity InGameView
+entity GameController
+
+skinparam dpi 300
+
+
+== InGameView 생성 및 화면 전환 ==
+GameState --> GameLauncher: 게임 초기화 완료 통보
+GameLauncher -> InGameView: new InGameView(boardNodes, players)
+note right: `InGameView(List<BoardNode>, List<Player>)` 생성자 호출
+activate InGameView
+
+GameLauncher -> GameController: new GameController(gameState, inGameView)
+note right: 컨트롤러 생성
+activate GameController
+
+InGameView -> GameController: setOnRollYut(() → controller.rollingYut())
+note right: “윷 던지기” 버튼 이벤트 연결
+
+GameLauncher -> GameLauncher: dispose()
+note right: 런처 화면 닫기 :contentReference[oaicite:10]{index=10}
+deactivate GameController
+deactivate InGameView
+@enduml

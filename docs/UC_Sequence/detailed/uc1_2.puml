@@ -1,0 +1,21 @@
+@startuml
+entity GameState
+entity Player
+entity Token
+skinparam dpi 300
+
+== 플레이어 및 토큰 생성 ==
+GameState -> Player: new Player(playerName, tokenCount)
+note right: Player 생성자: 토큰 수 검증 후 생성
+activate Player
+
+loop 플레이어별 Token 생성 (tokenCount만큼)
+    Player -> Token: new Token(tokenName, this)
+    note right: `Token(String name, Player owner)` 생성자 호출
+    Player <-- Token: tokenInstance
+end
+
+Player --> GameState: Player 인스턴스 반환
+note left: `new Player(...)` 실행 후 `List<Player>`에 추가
+deactivate Player
+@enduml
