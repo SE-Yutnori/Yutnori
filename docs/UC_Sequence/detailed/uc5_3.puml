@@ -1,0 +1,14 @@
+@startuml
+participant GameController
+participant GameLauncher
+participant System
+
+== 사용자 선택에 따른 "재시작" 또는 "종료" 처리 ==
+alt choice == GameEndChoice.RESTART
+    GameController -> GameLauncher: restartGame()
+    note right: GameController 내부:\nif (onGameRestart != null) onGameRestart.run();\nonGameRestart로 설정된 Runnable에서는\nnew GameLauncher().start(new Stage()); 와 같이\n초기 화면(Launcher)으로 돌아감
+else choice == GameEndChoice.EXIT
+    GameController -> System: exit(0)
+    note right: GameController 내부:\nif (onGameExit != null) onGameExit.run();\nonGameExit로 설정된 Runnable에서는\nPlatform.exit() 또는 System.exit(0)로 앱 종료
+end
+@enduml

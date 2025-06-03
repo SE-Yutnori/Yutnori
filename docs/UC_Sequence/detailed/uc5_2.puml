@@ -1,0 +1,20 @@
+@startuml
+participant GameController
+participant InGameView
+participant GameState
+participant Player
+
+== 승리 화면 표시 및 사용자 옵션 선택 ==
+GameController -> GameState: getWinner()
+note right: GameState 내부에 저장된 승자 Player 반환
+activate GameState
+
+GameController -> InGameView: getGameEndChoice(winner.getName() + " 승리!")
+note right: InGameView.getGameEndChoice 내부:\nAlert 다이얼로그 띄워서 "플레이어A 승리!" 표시\n"다시 시작(RESTART)" / "종료(EXIT)" 버튼 노출\n사용자가 버튼 클릭하면 GameEndChoice enum 반환
+activate InGameView
+
+InGameView --> GameController: GameEndChoice choice
+note left: 사용자가 "RESTART" 또는 "EXIT" 중 하나 선택 후 반환
+deactivate InGameView
+deactivate GameState
+@enduml

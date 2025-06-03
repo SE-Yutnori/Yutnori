@@ -1,0 +1,22 @@
+@startuml
+participant GameController
+participant GameState
+participant Player
+
+== 각 턴 이동이 끝난 뒤 승리 조건 검사 ==
+GameController -> GameState: checkVictory(currentPlayer)
+note right: GameState.checkVictory 내부:\nif (currentPlayer.hasFinished()) {\n    phase = FINISHED;\n    winner = currentPlayer;\n    return true;\n}\nreturn false;
+activate GameState
+
+alt checkVictory == true
+    GameState --> GameController: true
+    note left: 사용자가 모든 토큰을 골인시킨 경우
+    GameController -> GameController: handleGameEnd(currentPlayer)
+    note right: 승리자 화면 표시 로직으로 분기
+else checkVictory == false
+    GameState --> GameController: false
+    note left: 아직 승자가 없음 → 다음 턴 진행
+end
+
+deactivate GameState
+@enduml
