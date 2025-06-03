@@ -3,7 +3,6 @@ package com.cas.yutnorifx.model.request;
 import com.cas.yutnorifx.model.entity.*;
 import java.util.List;
 
-//토큰 선택 요청 정보를 담는 클래스
 public class TokenSelectionRequest {
     private final List<Token> availableTokens;
     private final int steps;

@@ -3,9 +3,6 @@ package com.cas.yutnorifx.model.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 게임 보드의 노드 구조만을 관리하는 클래스
- */
 public class Board {
     private List<BoardNode> nodes;
     private BoardNode startNode;
@@ -25,13 +22,11 @@ public class Board {
     private void initializeBoard() {
         this.nodes = new ArrayList<>();
         
-        // Center 노드 생성
         float centerX = 2.5f;
         float centerY = 2.5f;
         BoardNode center = new BoardNode("Center", centerX, centerY, sides);
         nodes.add(center);
         
-        // 외곽 변 노드와 센터로 향하는 노드 배열 생성
         BoardNode[][] edgeNodes = new BoardNode[sides][6];
         BoardNode[] toCenterPath1 = new BoardNode[sides];
         BoardNode[] toCenterPath2 = new BoardNode[sides];
@@ -40,7 +35,6 @@ public class Board {
         createCenterPathNodes(edgeNodes, center, toCenterPath1, toCenterPath2, centerX, centerY);
         connectNodes(edgeNodes, center, toCenterPath1, toCenterPath2);
         
-        // 동적으로 첫 번째 모서리 노드를 시작 노드로 설정
         this.startNode = edgeNodes[0][0];
     }
     
@@ -99,12 +93,10 @@ public class Board {
     private void connectNodes(BoardNode[][] edgeNodes, BoardNode center,
                             BoardNode[] toCenterPath1, BoardNode[] toCenterPath2) {
         for (int i = 0; i < sides; i++) {
-            // 외곽 노드 연결
             for (int j = 0; j < 5; j++) {
                 edgeNodes[i][j].addNextNode(edgeNodes[i][j + 1]);
             }
             
-            // 꼭짓점과 센터 노드 연결
             if (i != 0 && i <= (sides + 1) / 2) {
                 edgeNodes[i][0].addNextNode(toCenterPath1[i]);
                 toCenterPath1[i].addNextNode(toCenterPath2[i]);
@@ -121,7 +113,6 @@ public class Board {
         }
     }
 
-    // 기본적인 getter 메서드들
     public List<BoardNode> getNodes() {
         return new ArrayList<>(nodes);
     }
@@ -136,21 +127,14 @@ public class Board {
                 .findFirst()
                 .orElse(null);
     }
-    
-    /**
-     * 현재 노드의 이전 노드를 찾는 메서드
-     * @param currentNode 현재 노드
-     * @return 이전 노드 (없으면 null)
-     */
     public BoardNode findPreviousNode(BoardNode currentNode) {
         if (currentNode == null) return null;
         
-        // 모든 노드를 순회하면서 currentNode를 nextNode로 가지는 노드 찾기
         for (BoardNode node : nodes) {
             if (node.getNextNodes().contains(currentNode)) {
                 return node;
             }
         }
-        return null; // 이전 노드가 없음 (시작 노드인 경우)
+        return null;
     }
 } 

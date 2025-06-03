@@ -1,6 +1,5 @@
 package com.cas.yutnorifx.model.event;
 
-//게임에서 발생하는 다양한 이벤트를 정의
 public class GameEvent {
     public enum Type {
         YUT_THROW_RESULT,// 윷 던지기 결과

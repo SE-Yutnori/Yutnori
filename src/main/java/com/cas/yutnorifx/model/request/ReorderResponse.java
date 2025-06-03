@@ -3,7 +3,6 @@ package com.cas.yutnorifx.model.request;
 import java.util.ArrayList;
 import java.util.List;
 
-//윷 결과 재배열 응답 정보를 담는 클래스
 public class ReorderResponse {
     private final String requestId;
     private final List<Integer> reorderedResults;

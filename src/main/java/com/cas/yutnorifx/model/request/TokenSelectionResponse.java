@@ -2,7 +2,6 @@ package com.cas.yutnorifx.model.request;
 
 import com.cas.yutnorifx.model.entity.*;
 
-//토큰 선택 응답 정보를 담는 클래스
 public class TokenSelectionResponse {
     private final String requestId;
     private final Token selectedToken;
