@@ -1,0 +1,32 @@
+@startuml
+control GameController
+entity YutGameRules
+entity Token
+entity TokenPositionManager
+
+== 선택된 토큰 이동 처리 ==
+GameController -> YutGameRules: applyMoves(selectedToken, steps, tokenManager)
+note right: 토큰 이동 로직 진입 (YutGameRules.applyMoves)
+activate YutGameRules
+
+YutGameRules -> Token: getTopMostToken()
+note right: 만약 업힌 토큰이라면 대표 토큰 찾아 반환
+
+YutGameRules -> Token: move(distance)
+note right: Token.move는 내부적으로 `previousNode`, `nextBranchChoice` 기반으로 다음 노드 계산 및 `TokenPositionManager.updateTokenPosition()` 호출
+activate Token
+
+Token --> YutGameRules: moveSuccess (boolean)
+note left: 이동 결과 반환
+deactivate Token
+
+YutGameRules -> TokenPositionManager: updateTokenPosition(token, newNode)
+note right: Token이 새로운 노드로 이동 시, 이전 노드 `leave()`, 새 노드 `enter()` 호출
+
+YutGameRules -> Token: setState(TokenState.ACTIVE)
+note right: 이동 도중 READY → ACTIVE 상태 변경 (이미 처리된 경우 스킵)
+
+YutGameRules --> GameController: MoveResult(success, caught, finished, message)
+note left: 이동 후 결과 정보 반환
+deactivate YutGameRules
+@enduml

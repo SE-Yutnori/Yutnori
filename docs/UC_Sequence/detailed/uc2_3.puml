@@ -1,0 +1,25 @@
+@startuml
+entity YutGameRules
+entity Token
+entity TokenPositionManager
+entity BoardNode
+entity Player
+
+== 분기: 골인/업기/잡기 ==
+YutGameRules -> Token: getCurrentNode()
+note right: 이동 후 토큰이 위치한 노드 조회 (TokenPositionManager 사용)
+
+alt 목표 노드가 골인 지점 (center 혹은 마지막 노드)
+    YutGameRules -> Token: setState(TokenState.FINISHED)
+    note right: 토큰 상태 FINISHED로 변경
+
+    YutGameRules -> Player: incrementFinishedCount()
+    note right: 해당 플레이어의 완주 토큰 개수 갱신
+else 동일 플레이어 토큰과 만남 (업기)
+    YutGameRules -> Token: addStackedToken(otherToken)
+    note right: 같은 팀 토큰을 스택 구조로 연결 (Token.addStackedToken)
+else 상대 플레이어 토큰과 만남 (잡기)
+    YutGameRules -> TokenPositionManager: resetToken(enemyToken)
+    note right: 상대 토큰과 업힌 토큰 모두 초기화 (TokenState.READY → 보드 밖)
+end
+@enduml
