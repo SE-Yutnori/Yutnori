@@ -16,7 +16,7 @@
 
 이 프로젝트는 **MVC (Model-View-Controller) 패턴**과 **Observer 패턴**을 결합하여 설계되었습니다.
 
-#### 1. **완전한 관심사 분리 (Separation of Concerns)**
+#### 1. **관심사 분리**
 
 | 계층 | 역할 | 주요 클래스 | 책임 |
 |------|------|-------------|------|
@@ -29,7 +29,7 @@
 사용자 입력 → View → Controller → Model → 이벤트 발행 → View 업데이트
 ```
 
-#### 2. **Observer 패턴을 통한 느슨한 결합**
+#### 2. **Observer 패턴을 통한결합**
 ```java
 // Model에서 이벤트 발생
 gameState.notifyObservers(new GameEvent(EventType.YUT_THROW_RESULT, "도가 나왔습니다!"));
@@ -42,80 +42,6 @@ public void onGameEvent(GameEvent event) {
 ```
 
 Model은 View가 JavaFX인지 Swing인지 전혀 알지 못합니다. 단순히 이벤트를 발행할 뿐이고, View는 관찰자로서 이벤트를 수신하여 적절히 화면을 업데이트합니다.
-
-### 전체 로직 흐름 (이벤트 기반)
-
-#### 1. **게임 진행 과정 (이벤트 중심)**
-```mermaid
-graph TB
-    A[사용자: 윷 던지기 버튼 클릭] --> B[View: Controller에 액션 전달]
-    B --> C[Controller: Model의 throwYut 메서드 호출]
-    C --> D[Model: 윷 결과 계산 및 GameEvent 발행]
-    D --> E[Observer Pattern: 모든 등록된 View에 이벤트 자동 전달]
-    E --> F[View: 윷 결과 화면 표시]
-    F --> G[Model: 말 이동 가능 여부 확인 후 이벤트 발행]
-    G --> H[View: 토큰 선택 다이얼로그 표시]
-    H --> I[사용자: 토큰 선택]
-    I --> J[View: Controller에 선택 결과 전달]
-    J --> K[Controller: Model의 moveToken 메서드 호출]
-    K --> L[Model: 이동 결과 계산 및 이벤트 발행]
-    L --> M[View: 보드 상태 자동 업데이트]
-```
-
-#### 2. **핵심 이벤트 타입별 처리**
-```java
-// Model에서 발생하는 주요 이벤트들
-public enum EventType {
-    YUT_THROW_RESULT,        // 윷 결과 → View가 결과 표시
-    MOVE_RESULT,             // 이동 결과 → View가 보드 업데이트
-    TOKEN_CAUGHT,            // 말 잡기 → View가 잡힌 말 애니메이션
-    TURN_CHANGED,            // 턴 변경 → View가 현재 플레이어 표시
-    GAME_ENDED,              // 게임 종료 → View가 승리 다이얼로그
-    TOKEN_SELECTION_NEEDED,  // 토큰 선택 필요 → View가 선택 다이얼로그
-    BRANCH_SELECTION_NEEDED, // 분기 선택 필요 → View가 분기 선택 다이얼로그
-    YUT_TEST_NEEDED,         // 테스트 윷 필요 → View가 테스트 다이얼로그
-    REORDER_NEEDED          // 재배열 필요 → View가 재배열 다이얼로그
-}
-```
-
-#### 3. **비동기 요청-응답 시스템**
-```java
-// Model → View 요청 (CompletableFuture 기반)
-CompletableFuture<TokenSelectionResponse> future = new CompletableFuture<>();
-notifyObservers(new GameEvent(TOKEN_SELECTION_NEEDED, request));
-
-// View → Model 응답 (콜백 기반)
-view.setOnTokenSelection(response -> {
-    controller.handleTokenSelection(response); // Controller를 통해 Model에 전달
-});
-```
-
-#### 5. **멀티 UI 지원**
-```java
-// GameState.java (Model) - UI에 무관한 순수 비즈니스 로직
-public class GameState extends GameEventNotifier {
-    public void throwYut() {
-        List<Integer> results = YutGameRules.throwYut();
-        notifyObservers(new GameEvent(YUT_THROW_RESULT, formatResults(results)));
-        // JavaFX든 Swing이든 상관없이 동일한 이벤트 발행
-    }
-}
-
-// FXInGameView.java와 SwingInGameView.java - 동일한 인터페이스 구현
-public class FXInGameView implements GameEventObserver {
-    @Override
-    public void onGameEvent(GameEvent event) {
-        // JavaFX 특화 UI 업데이트
-    }
-}
-
-public class SwingInGameView implements GameEventObserver {
-    @Override
-    public void onGameEvent(GameEvent event) {
-        // Swing 특화 UI 업데이트 (동일한 로직, 다른 UI 프레임워크)
-    }
-}
-```
 
 ## 실행 방법
 
@@ -152,13 +78,11 @@ public class SwingInGameView implements GameEventObserver {
 - **목표**: 모든 말을 상대방보다 먼저 도착시키기
 - **윷 결과**: 빽도(-1), 도(1), 개(2), 걸(3), 윷(4), 모(5)
 - **추가 턴**: 윷(4), 모(5), 상대 말 잡기 시 추가 턴 획득
-
-### 특별 규칙
 - **말 잡기**: 상대방 말이 있는 곳에 도착하면 상대방 말을 처음으로 되돌림
 - **말 업기**: 같은 팀 말이 있는 곳에 도착하면 함께 이동
 - **분기 선택**: 여러 경로가 있는 노드에서 방향 선택 가능
 
-## 🛠기술 스택
+## 기술 스택
 
 - **언어**: Java 23
 - **UI 프레임워크**: JavaFX, Swing
