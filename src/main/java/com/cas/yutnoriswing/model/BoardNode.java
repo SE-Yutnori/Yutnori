@@ -11,13 +11,7 @@ public class BoardNode {
     private List<Token> tokens;           // 현재 올라와 있는 토큰들
     private int sides;                    // 보드의 각 수 (중앙 경로 분기 판단용)
 
-    /**
-     * BoardNode 생성자
-     * @param name : 각 보드 노드당 이름 설정
-     * @param sides : 각형 정보
-     * @param x : GUI 상 노드의 x 좌표값
-     * @param y : GUI 상 노드의 y 좌표값
-     */
+    //BoardNode 생성자
     public BoardNode(String name, float x, float y, int sides) {
         this.name = name;
         this.x = x;
@@ -27,7 +21,7 @@ public class BoardNode {
         this.tokens = new ArrayList<>();
     }
 
-    //Getter
+    //Getter 메서드
     public String getName() {
         return name;
     }
@@ -53,26 +47,17 @@ public class BoardNode {
     }
 
 
-    /**
-     * 해당 노드에 말 위치 시 기록 메서드
-     * @param token : 새롭게 위치한 토큰(말)
-     */
+    //해당 노드에 말 위치 시 새로 기록해주는 메서드
     public void enter(Token token) {
         tokens.add(token);
     }
 
-    /**
-     * 해당 노드에서 말이 떠날 시 해당 토큰 삭제 메서드
-     * @param token : 떠난 토큰(말)
-     */
+    //해당 노드에서 말이 떠날 시 해당 토큰을 삭제해주는 메서드
     public void leave(Token token) {
         tokens.remove(token);
     }
 
-    /**
-     * 해당 노드 위치한 Token(말) 반환 메서드
-     * @return : List[Token] 반환
-     */
+    //해당 노드 위치한 말을 반환하는 메서드
     public List<Token> getTokens() {
         return tokens;
     }

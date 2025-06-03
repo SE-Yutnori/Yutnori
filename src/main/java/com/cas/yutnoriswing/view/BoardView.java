@@ -18,9 +18,10 @@ public class BoardView extends JPanel {
             Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA
     };
     
-    // 첫 번째 노드 (시작 노드) 참조
+    // 첫 번째 노드 (시작 노드)
     private final BoardNode startNode;
 
+    //임의로 화면 비율 조정 가능
     private static final int SPACING = 120;
     private static final int OFFSET = 10;
 
@@ -28,7 +29,7 @@ public class BoardView extends JPanel {
         this.nodes = nodes;
         this.players = players;
         
-        // 시작 노드 찾기 (첫 번째 모서리 노드)
+        // 시작 노드 찾기 (Edge 0-0)
         this.startNode = nodes.stream()
                 .filter(node -> node.getName().matches("Edge\\d+-0"))
                 .findFirst()
@@ -56,7 +57,7 @@ public class BoardView extends JPanel {
             int x1 = (int) (node.getX() * SPACING + OFFSET);
             int y1 = (int) (node.getY() * SPACING + OFFSET);
 
-            // 분기점이거나 시작 노드인 경우 특별한 화살표 그리기
+            // 분기점이거나 시작 노드인 경우 화살표로 그리기
             if (size >= 2 || node.equals(startNode)) {
                 for (int k = 1; k < size - 1; k++) {
                     BoardNode mid = nextNodes.get(k);
@@ -84,7 +85,8 @@ public class BoardView extends JPanel {
                     g2d.draw(new Line2D.Double(x1, y1, tx, ty));
                     drawArrowHead(g2d, x1, y1, tx, ty);
 
-                    int midX = (2 * x1 + 3 * x2) / 5;
+                    //해당 비율 조정하면서 분기 방향 글자 원에 안 씹히게 조절 가능..
+                    int midX = (2 * x1 + 4 * x2) / 6;
                     int midY = (2 * y1 + 3 * y2) / 5;
                     String label = next.getName().contains("Edge")
                             ? "1"
@@ -104,14 +106,14 @@ public class BoardView extends JPanel {
             }
         }
 
-        // 노드 (원) 그리기
+        // 노드 (원 모양으로) 그리기
         for (BoardNode node : nodes) {
             int x = (int) (node.getX() * SPACING + OFFSET);
             int y = (int) (node.getY() * SPACING + OFFSET);
 
             int out = 56;
             int radius = 36;
-            // 중요한 노드들 (Center, 모서리 시작점, 모서리 끝점)은 특별한 원으로 표시
+            // 중요한 노드들 (Center, 모서리 시작점, 모서리 끝점)은 이중 원으로 표시
             boolean isImportantNode = node.getName().equals("Center") || 
                                     node.getName().matches("Edge\\d+-0") || 
                                     node.getName().matches("Edge\\d+-5");
@@ -142,7 +144,7 @@ public class BoardView extends JPanel {
                 g2d.draw(new Ellipse2D.Double(drawX, drawY, radius, radius));
             }
 
-            // 시작 노드 표시 (동적으로 찾은 시작 노드)
+            // 시작 노드는 이름 표시하기 (나머지도 아래 주석 풀면 이름 다 보임)
             if (node.equals(startNode)) {
                 g2d.setFont(new Font("Arial", Font.BOLD, 16));
                 g2d.setColor(Color.RED);
@@ -151,7 +153,7 @@ public class BoardView extends JPanel {
                 g2d.drawString("start", textX, textY);
             }
             
-            // // 각 BoardNode의 이름 표시하는 코드들.. 디버깅용.. 추후 삭제 예정           
+            // // 각 BoardNode의 이름 표시하는 코드들 (디버깅용) 추후 삭제 예정
             // g2d.setFont(new Font("Arial", Font.PLAIN, 10));
             // g2d.setColor(Color.BLUE);
             // FontMetrics fm = g2d.getFontMetrics();

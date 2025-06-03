@@ -1,5 +1,7 @@
 package com.cas.yutnoriswing.model;
 
+import com.cas.yutnoriswing.YutnoriGameSwing;
+import com.cas.yutnoriswing.view.InGameView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -91,7 +93,7 @@ class YutGameRulesTest {
         String validInput = "4,1,5,3";
         
         // When: 검증 실행
-        YutGameRules.ReorderResult result = YutGameRules.validateReorderInput(validInput, originalResults);
+        InGameView.ReorderResult result = InGameView.validateReorderInput(validInput, originalResults);
         
         // Then: 성공해야 함
         assertTrue(result.isSuccess());
@@ -105,23 +107,23 @@ class YutGameRulesTest {
         List<Integer> originalResults = Arrays.asList(1, 3, 4);
         
         // 1. 빈 입력
-        YutGameRules.ReorderResult result1 = YutGameRules.validateReorderInput("", originalResults);
+        InGameView.ReorderResult result1 = InGameView.validateReorderInput("", originalResults);
         assertFalse(result1.isSuccess());
         
         // 2. 개수 불일치
-        YutGameRules.ReorderResult result2 = YutGameRules.validateReorderInput("1,3", originalResults);
+        InGameView.ReorderResult result2 = InGameView.validateReorderInput("1,3", originalResults);
         assertFalse(result2.isSuccess());
         
         // 3. 범위 벗어난 값
-        YutGameRules.ReorderResult result3 = YutGameRules.validateReorderInput("1,3,6", originalResults);
+        InGameView.ReorderResult result3 = InGameView.validateReorderInput("1,3,6", originalResults);
         assertFalse(result3.isSuccess());
         
         // 4. 숫자가 아닌 값
-        YutGameRules.ReorderResult result4 = YutGameRules.validateReorderInput("1,a,3", originalResults);
+        InGameView.ReorderResult result4 = InGameView.validateReorderInput("1,a,3", originalResults);
         assertFalse(result4.isSuccess());
         
         // 5. 다른 값들
-        YutGameRules.ReorderResult result5 = YutGameRules.validateReorderInput("1,2,3", originalResults);
+        InGameView.ReorderResult result5 = InGameView.validateReorderInput("1,2,3", originalResults);
         assertFalse(result5.isSuccess());
     }
 

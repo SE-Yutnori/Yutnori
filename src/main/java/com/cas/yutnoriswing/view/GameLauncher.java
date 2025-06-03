@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-//게임을 시작하는 class
+//게임을 시작하며 사용자가 게임 관련 초기설정을 하는 class
 public class GameLauncher {
     /**
      * 게임에 필요한 정보 수집 이후 플레이
@@ -18,20 +18,19 @@ public class GameLauncher {
      * 2. 테스트 모드 여부
      * 3. 플레이어 수
      * 4. 플레이어가 사용할 말 개수
+     * 5. 플레이어 이름
      */
     public void start() {
-        // 보드 커스터마이징 메서드 호출
+        // 보드 커스터마이징하기
         int sides = boardCustom();
 
         // 테스트 모드 여부 입력받기
         boolean testMode = getTestMode();
         YutGameRules.setTestMode(testMode);
 
-        // 플레이어 정보 설정
+        // 플레이어 정보 설정 후 플레이어 수와 토큰 수 입력받기
         List<String> playerNames = new ArrayList<>();
         List<Integer> tokenCounts = new ArrayList<>();
-        
-        // 플레이어 수와 토큰 수 입력받기
         int numPlayers = getPlayerCount();
         int numTokens = getTokenCount();
         
@@ -60,7 +59,7 @@ public class GameLauncher {
             }
         }
 
-        // GameState 생성 (Board와 Player들이 자동으로 생성됨)
+        // GameState 생성 (이때, Board와 Player들이 자동으로 생성됨)
         GameState gameState = new GameState(sides, 2.0f, playerNames, tokenCounts);
 
         // 게임 화면 생성
@@ -76,11 +75,11 @@ public class GameLauncher {
         controller.setOnGameRestart(() -> restartApplication());
         controller.setOnGameExit(() -> exitApplication());
 
-        // 메인 프레임 생성 및 표시
+        // 메인 프레임 생성
         JFrame frame = new JFrame("윷놀이");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(inGameView.getRoot());
-        // 정사각형 보드에 맞게 크기 조정 (보드 720x720 + 상태패널 200 + 여백)
+        // 정사각형 보드에 맞게 크기 조정
         frame.setSize(1000, 800);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -88,10 +87,10 @@ public class GameLauncher {
         this.currentFrame = frame;
     }
 
-    // 현재 Frame 관리
+    // 현재 Frame
     private JFrame currentFrame;
 
-    // Application 재시작 처리
+    // 게임 재시작 처리
     private void restartApplication() {
         if (currentFrame != null) {
             currentFrame.dispose();
@@ -99,15 +98,12 @@ public class GameLauncher {
         start(); // 새 게임 시작
     }
 
-    // Application 종료 처리
+    // 게임 종료 처리
     private void exitApplication() {
         System.exit(0);
     }
 
-    /**
-     * 사용자에게 n각형 커스터마이징을 입력받는 메서드
-     * @return : sides(입력받은 n값 반환)
-     */
+    //사용자에게 n각형 커스터마이징을 입력받는 메서드
     private int boardCustom() {
         while (true) {
             String result = JOptionPane.showInputDialog(null, 
@@ -121,7 +117,7 @@ public class GameLauncher {
                 int sides = Integer.parseInt(result);
                 if (sides >= 4 && sides <= 6) return sides;
             } catch (NumberFormatException e) {
-                // 4 이상 6 이하가 아닌 경우 무시하고 다시 입력받음
+                // 4 이상 6 이하가 아닌 경우 무시하고 다시 입력받음 (이 설정 없을 시 6 이상의 n각형도 생성 후 플레이 가능)
             }
         }
     }
@@ -136,10 +132,7 @@ public class GameLauncher {
         return result == JOptionPane.YES_OPTION;
     }
 
-    /**
-     * 플레이어 수를 입력받는 메서드 (2-4명)
-     * @return : numPlayers
-     */
+    //플레이어 수를 입력받는 메서드 (2-4명)
     private int getPlayerCount() {
         while (true) {
             String result = JOptionPane.showInputDialog(null, 
@@ -157,10 +150,7 @@ public class GameLauncher {
         }
     }
 
-    /**
-     * 사용할 말의 갯수를 입력 받는 메서드 (2-5명)
-     * @return : tokenCount
-     */
+    //사용할 말의 갯수를 입력 받는 메서드 (2-5명)
     private int getTokenCount() {
         while (true) {
             String result = JOptionPane.showInputDialog(null, 
@@ -173,11 +163,12 @@ public class GameLauncher {
                 int count = Integer.parseInt(result.trim());
                 if (count >= 2 && count <= 5) return count;
             } catch (NumberFormatException e) {
-                // 무시하고 다시 입력받음
+                // 2-5개가 아닌 경우 무시하고 다시 입력받음
             }
         }
     }
 
+    //기타 오류 메세지를 출력하는 메서드
     private void showError(String message) {
         JOptionPane.showMessageDialog(null, message, "오류", JOptionPane.ERROR_MESSAGE);
     }

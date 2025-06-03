@@ -1,30 +1,26 @@
 package com.cas.yutnoriswing.view;
 
-import com.cas.yutnoriswing.model.BoardNode;
-import com.cas.yutnoriswing.model.Player;
-import com.cas.yutnoriswing.model.Token;
-import com.cas.yutnoriswing.model.TokenState;
+import com.cas.yutnoriswing.model.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InGameView {
-    // 보드 뷰
+    //mainPanel에 보이는 요소들 - 보드, 플레이어, 플레이어 말 상태창
     private final BoardView boardView;
-    // 플레이어 리스트 (이름, Token 리스트 보유)
     private final List<Player> players;
-    // 오른쪽에 나타나는 상태 패널
     private final JPanel statusPanel;
-    // 메인 패널
     private final JPanel mainPanel;
 
-    // 플레이어 색상 배열
+    // 플레이어 색상은 임의 할당 (순서 임의 변경 불가)
     private final Color[] playerColors = {
             Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA
     };
 
-    //Runnable 타입의 onRollYut 변수 선언
+    //onRollYut(윷을 던지는) 변수 선언
     private Runnable onRollYut;
 
     // InGameView 생성자
@@ -35,20 +31,47 @@ public class InGameView {
         //상태패널 생성
         this.statusPanel = new JPanel();
         this.statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
-        // 정사각형 보드(720x720)에 맞게 높이 조정
+        // 정사각형 보드에 맞게 높이 조정
         this.statusPanel.setPreferredSize(new Dimension(200, 720));
         this.statusPanel.setBorder(BorderFactory.createTitledBorder("플레이어 상태"));
         
         //메인 패널 생성
         this.mainPanel = new JPanel(new BorderLayout());
         
-        //상태패널 빌드
+        //상태패널
         buildStatusPanel();
         setupMainPanel();
     }
 
+    //순서 재배열 결과를 담는 클래스
+    public static class ReorderResult {
+        private final boolean success;
+        private final List<Integer> reorderedResults;
+        private final String errorMessage;
+
+        public static ReorderResult success(List<Integer> results) {
+            return new ReorderResult(true, results, null);
+        }
+
+        public static ReorderResult error(String message) {
+            return new ReorderResult(false, null, message);
+        }
+
+        private ReorderResult(boolean success, List<Integer> reorderedResults, String errorMessage) {
+            this.success = success;
+            this.reorderedResults = reorderedResults != null ? new ArrayList<>(reorderedResults) : null;
+            this.errorMessage = errorMessage;
+        }
+
+        public boolean isSuccess() { return success; }
+        public List<Integer> getReorderedResults() {
+            return reorderedResults != null ? new ArrayList<>(reorderedResults) : null;
+        }
+        public String getErrorMessage() { return errorMessage; }
+    }
+
     private void setupMainPanel() {
-        // 보드뷰를 중앙에 배치
+        // 보드를 중앙에 배치
         mainPanel.add(boardView, BorderLayout.CENTER);
         
         // 상태패널을 오른쪽에 배치
@@ -68,10 +91,12 @@ public class InGameView {
         });
     }
 
+
     public JPanel getRoot() {
         return mainPanel;
     }
 
+    //말 이동 변경을 컨트롤러가 알려주면 view에서 갱신해주는 메서드
     public void refresh() {
         boardView.refresh();
         buildStatusPanel();
@@ -90,6 +115,9 @@ public class InGameView {
     public void showError(String message) {
         JOptionPane.showMessageDialog(mainPanel, message, "입력 오류", JOptionPane.ERROR_MESSAGE);
     }
+
+    //게임 내 사용자가 개입해야 하는 요소들에 대한 것들을 정의
+    //테스트모드 윷 던지기, 말 선택하기, 분기 선택하기, 게임 종료/재시작 여부, 순서 재배열
 
     public int getTestYutThrow() {
         String[] options = {"빽도", "도", "개", "걸", "윷", "모"};
@@ -145,6 +173,41 @@ public class InGameView {
                 .orElse(null);
     }
 
+    public static InGameView.ReorderResult validateReorderInput(String input, List<Integer> originalResults) {
+        if (input == null || input.trim().isEmpty()) {
+            return InGameView.ReorderResult.error("입력이 비어있습니다.");
+        }
+
+        String[] parts = input.split(",");
+        if (parts.length != originalResults.size()) {
+            return InGameView.ReorderResult.error("입력 개수가 실제 개수와 다릅니다!");
+        }
+
+        List<Integer> reordered = new ArrayList<>();
+        try {
+            for (String p : parts) {
+                int val = Integer.parseInt(p.trim());
+                if ((val < -1 || val > 5) || val == 0) {
+                    return InGameView.ReorderResult.error("윷 값 (-1,1~5)을 벗어났습니다: " + val);
+                }
+                reordered.add(val);
+            }
+        } catch (NumberFormatException e) {
+            return InGameView.ReorderResult.error("숫자가 아닌 값이 포함되어 있습니다.");
+        }
+
+        List<Integer> sortedOrig = new ArrayList<>(originalResults);
+        List<Integer> sortedReorder = new ArrayList<>(reordered);
+        Collections.sort(sortedOrig);
+        Collections.sort(sortedReorder);
+
+        if (!sortedOrig.equals(sortedReorder)) {
+            return InGameView.ReorderResult.error("입력한 값이 실제 윷 결과와 다릅니다.");
+        }
+
+        return InGameView.ReorderResult.success(reordered);
+    }
+
     public BoardNode selectPath(List<BoardNode> options) {
         if (options.size() <= 1) {
             return options.get(0);
@@ -176,27 +239,24 @@ public class InGameView {
     }
 
     private void buildStatusPanel() {
-        //상태패널 자식 컴포넌트 제거
         statusPanel.removeAll();
 
-        //플레이어 수만큼 반복
+        //플레이어 수만큼 반복해서
         for (int i = 0; i < players.size(); i++) {
-            //플레이어 객체 가져오기
+            //각 플레이어의 객체 가져오기
             Player player = players.get(i);
 
-            //플레이어 이름 레이블 생성
             JLabel playerLabel = new JLabel("<< " + player.getName() + " >>");
             playerLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
             playerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             statusPanel.add(playerLabel);
             
-            //플레이어 토큰 수만큼 반복
+            //플레이어 토큰 수만큼 반복하여
             for (Token token : player.getTokens()) {
-                //토큰 상태가 READY인 경우
+                //토큰 상태가져와서 보여주기
                 if (token.getState() == TokenState.READY) {
                     JPanel tokenPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                    
-                    // 색상 표시용 작은 패널
+
                     JPanel colorPanel = new JPanel();
                     colorPanel.setBackground(playerColors[i % playerColors.length]);
                     colorPanel.setPreferredSize(new Dimension(10, 10));
@@ -209,8 +269,8 @@ public class InGameView {
                     statusPanel.add(tokenPanel);
                 }
             }
-            
-            // 플레이어 간 구분선
+
+            //플레이어 구분선
             if (i < players.size() - 1) {
                 statusPanel.add(Box.createVerticalStrut(10));
                 statusPanel.add(new JSeparator());

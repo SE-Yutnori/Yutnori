@@ -37,7 +37,7 @@ public class GameController {
     public void rollingYut() {
         Player currentPlayer = gameState.getCurrentPlayer();
 
-        // 1. 윷 던지기 (각 모/윷마다 즉시 처리)
+        // 윷 던지기 (윷 결과에 대해서 처리)
         List<Integer> allResults = new ArrayList<>();
         
         if (YutGameRules.isTestMode()) {
@@ -52,7 +52,7 @@ public class GameController {
             return; // 취소됨
         }
 
-        // 2. 순서 재배열 처리
+        // 순서 재배열 (모나 윷의 경우에 대한 처리)
         List<Integer> orderedResults;
         if (allResults.size() == 1) {
             orderedResults = allResults;
@@ -63,16 +63,16 @@ public class GameController {
             }
         }
 
-        // 3. 이동 처리
+        // 이동
         boolean catched = handleMoveExecution(orderedResults);
 
-        // 4. 승리 조건 확인
+        // 승리 조건
         if (gameState.isGameEnded()) {
             handleGameEnd(gameState.getWinner());
             return;
         }
 
-        // 5. 다음 턴 결정
+        // 다음 턴 결정 (잡기의 경우 추가 턴 부여)
         if (catched) {
             view.showMessage(currentPlayer.getName() + "님이 말을 잡아 추가 턴을 얻었습니다!", "추가 턴");
         } else {
@@ -80,12 +80,13 @@ public class GameController {
         }
     }
     
-    // 테스트 모드 던지기 처리
+    // 테스트 모드 던지기
     private void handleTestModeThrows(Player currentPlayer, List<Integer> allResults) {
         int throwCount = 0;
         boolean continueThrow = true;
         
         while (continueThrow) {
+            //view에서 값 가져오기
             int testResult = view.getTestYutThrow();
             if (testResult == -999) { // 취소
                 return;
@@ -96,15 +97,15 @@ public class GameController {
             if (throwCount == 0) {
                 message = currentPlayer.getName() + ": " + yutName + " (" + testResult + "칸)";
             } else {
-                message = "한번 더! " + yutName + " (" + testResult + "칸)";
+                message = "추가 윷 던지기 결과 : " + yutName + " (" + testResult + "칸)";
             }
             
-            // 즉시 결과 표시
+            // 결과 표시
             view.showMessage(message, "윷 결과");
             allResults.add(testResult);
             throwCount++;
             
-            // 윷이나 모가 나오면 추가 기회 메시지
+            // 윷이나 모가 나오면 추가 기회 메시지 사용자에게 보여주기
             if (testResult >= 4) {
                 view.showMessage(yutName + "가 나왔습니다! 한번 더 기회가 주어집니다!", "추가 기회");
             } else {
@@ -113,13 +114,13 @@ public class GameController {
         }
     }
     
-    // 일반 모드 던지기 처리
+    // 일반 모드 던지기
     private void handleNormalModeThrows(Player currentPlayer, List<Integer> allResults) {
         int throwCount = 0;
         boolean continueThrow = true;
         
         while (continueThrow) {
-            // 윷 던지기 실행
+            // 일반 윷 던지기의 경우는 view에서 값을 가져올 필요가 없음
             int result = YutGameRules.throwSingleYut().getResults().get(0); // 단일 던지기
             
             String yutName = getYutName(result);
@@ -127,7 +128,7 @@ public class GameController {
             if (throwCount == 0) {
                 message = currentPlayer.getName() + ": " + yutName + " (" + result + "칸)";
             } else {
-                message = "한번 더! " + yutName + " (" + result + "칸)";
+                message = "추가 윷 던지기 결과 : " + yutName + " (" + result + "칸)";
             }
             
             // 즉시 결과 표시
@@ -135,7 +136,7 @@ public class GameController {
             allResults.add(result);
             throwCount++;
             
-            // 윷이나 모가 나오면 추가 기회 메시지
+            // 윷이나 모가 나오면 추가 기회 메시지 표시
             if (result >= 4) {
                 view.showMessage(yutName + "가 나왔습니다! 한번 더 기회가 주어집니다!", "추가 기회");
             } else {
@@ -144,7 +145,7 @@ public class GameController {
         }
     }
 
-    // 순서 재배열 처리
+    // 순서 재배열
     private List<Integer> handleReorderResults(List<Integer> results, String playerName) {
         YutGameRules.ReorderRequest request = new YutGameRules.ReorderRequest(results, playerName);
         
@@ -154,7 +155,7 @@ public class GameController {
                 return null; // 취소
             }
             
-            YutGameRules.ReorderResult result = YutGameRules.validateReorderInput(input, results);
+            InGameView.ReorderResult result = InGameView.validateReorderInput(input, results);
             if (result.isSuccess()) {
                 return result.getReorderedResults();
             } else {
@@ -163,12 +164,12 @@ public class GameController {
         }
     }
 
-    // 이동 실행 처리
+    // 이동 실행
     private boolean handleMoveExecution(List<Integer> steps) {
         boolean overallCatched = false;
         
         for (int step : steps) {
-            // 1. 이동 가능한 토큰 계산
+            // 이동 가능한 토큰을 계산하여 해당 윷 결과에 이동 가능한 말만 표시
             List<Token> availableTokens = gameState.getMovableTokens(step);
             
             if (availableTokens.isEmpty()) {
@@ -180,14 +181,14 @@ public class GameController {
                 continue;
             }
             
-            // 2. View에서 사용자 토큰 선택
+            // View에서 사용자가 말 선택
             Token selectedToken = view.selectToken(availableTokens, step);
             if (selectedToken == null) {
                 view.showError("말을 선택하지 않아 이동을 중단합니다.");
                 return overallCatched;
             }
             
-            // 3. 토큰 선택 후 현재 위치가 분기점인지 확인하고 분기 선택
+            // 말 선택 후 현재 위치가 분기점인지 확인하고 분기 선택
             Token actualToken = selectedToken.getTopMostToken();
             BoardNode currentPosition = gameState.getTokenPositionManager().getTokenPosition(actualToken);
             
@@ -199,13 +200,13 @@ public class GameController {
                 view.showMessage(getPathDescription(chosenPath) + " 경로를 선택했습니다.", "경로 선택");
             }
             
-            // 4. Model에서 이동 실행
+            // Model에서 실질적인 이동 실행
             YutGameRules.MoveResult moveResult = gameState.moveToken(selectedToken, step, options -> {
                 // 분기점에서 사용자가 경로 선택 (1칸 이동에서만 호출됨)
                 return view.selectPath(options);
             });
             
-            // 5. View에 결과 반영
+            // View에 해당 이동 결과 반영
             if (!moveResult.isSuccess()) {
                 view.showError(moveResult.getMessage());
                 continue;
@@ -218,17 +219,18 @@ public class GameController {
             if (!moveResult.getMessage().isEmpty()) {
                 view.showMessage(moveResult.getMessage(), "이동 결과");
             }
-            
+
+            //view 화면 갱신
             view.refresh();
             
-            // 6. 각 이동 완료 후 즉시 승리 조건 확인
+            // 각 이동 완료 후 즉시 승리 조건 확인
             Player currentPlayer = gameState.getCurrentPlayer();
             if (gameState.checkVictory(currentPlayer)) {
                 handleGameEnd(currentPlayer);
                 return overallCatched; // 게임 종료
             }
             
-            // 게임 종료 확인 (기존 로직 유지)
+            // 게임 종료 확인
             if (gameState.isGameEnded()) {
                 break;
             }
@@ -237,7 +239,7 @@ public class GameController {
         return overallCatched;
     }
 
-    // 경로 설명을 위한 헬퍼 메서드
+    // 경로 설명을 위한 메서드
     private String getPathDescription(BoardNode node) {
         if (node.getName().contains("Edge")) {
             return "외곽";
@@ -263,7 +265,7 @@ public class GameController {
         }
     }
     
-    // 윷 이름 변환 유틸리티
+    // 윷 이름 반환
     private String getYutName(int steps) {
         if (steps < 0) {
             return "빽도";
