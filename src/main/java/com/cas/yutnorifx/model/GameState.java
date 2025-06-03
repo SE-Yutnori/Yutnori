@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-/**
- * 게임의 전반적인 상태를 관리하는 클래스
- */
+
+//게임의 전반적인 상태를 관리하는 클래스
 public class GameState {
     private final List<Player> players;
     private final TokenPositionManager tokenPositionManager;
@@ -15,7 +14,7 @@ public class GameState {
     private GamePhase phase;
     private List<Integer> remainingMoves;
     private Player winner;
-    
+
     public GameState(List<Player> players, TokenPositionManager tokenPositionManager, Board board) {
         this.players = new ArrayList<>(players);
         this.tokenPositionManager = tokenPositionManager;
@@ -23,7 +22,7 @@ public class GameState {
         this.phase = GamePhase.NOT_STARTED;
         this.remainingMoves = new ArrayList<>();
         this.winner = null;
-        
+
         if (!players.isEmpty()) {
             this.currentPlayer = players.get(0);
         }
@@ -49,7 +48,7 @@ public class GameState {
             this.currentPlayer = players.get(0);
         }
     }
-    
+
     public void startGame() {
         if (phase == GamePhase.NOT_STARTED) {
             phase = GamePhase.IN_PROGRESS;
@@ -60,39 +59,24 @@ public class GameState {
     public YutGameRules.YutThrowResult throwYut() {
         return YutGameRules.throwYut();
     }
-    
+
+    //턴을 넘겨주는 메서드
     public void nextTurn() {
         int currentIndex = players.indexOf(currentPlayer);
         currentIndex = (currentIndex + 1) % players.size();
         currentPlayer = players.get(currentIndex);
         remainingMoves.clear();
     }
-
-    // 기존 nextPlayer() 메서드와 동일
     public void nextPlayer() {
         nextTurn();
     }
-    
-    public void addMoves(List<Integer> moves) {
-        remainingMoves.addAll(moves);
-    }
-    
-    public Integer useNextMove() {
-        if (remainingMoves.isEmpty()) {
-            return null;
-        }
-        return remainingMoves.remove(0);
-    }
-    
-    public boolean hasRemainingMoves() {
-        return !remainingMoves.isEmpty();
-    }
 
+    //이동 가능한 토큰들
     public List<Token> getMovableTokens(int steps) {
         if (currentPlayer == null) return new ArrayList<>();
-        
+
         if (steps < 0) {
-            // 빽도는 ACTIVE 상태인 토큰들만 (업힌 토큰들도 포함)
+            // 빽도는 ACTIVE 상태인 토큰들만 이동 가능
             return currentPlayer.getTokens().stream()
                     .filter(token -> token.getState() == TokenState.ACTIVE)
                     .collect(java.util.stream.Collectors.toList());
@@ -104,12 +88,13 @@ public class GameState {
         }
     }
 
+    //말을 움직이는
     public YutGameRules.MoveResult moveToken(Token token, int steps, Function<List<BoardNode>, BoardNode> branchSelector) {
         if (phase == GamePhase.FINISHED) {
             return new YutGameRules.MoveResult(false, false, false, "게임이 종료되었습니다.");
         }
 
-        // 실제 이동할 대표 토큰 찾기
+        // 실제 이동할 대표 토큰 찾기 (업기)
         Token actualToken = token.getTopMostToken();
 
         if (steps < 0) {
@@ -124,7 +109,7 @@ public class GameState {
             return YutGameRules.moveToken(actualToken, steps, tokenPositionManager, branchSelector);
         }
     }
-    
+
     public boolean checkVictory(Player player) {
         if (player.hasFinished()) {
             phase = GamePhase.FINISHED;
@@ -137,20 +122,12 @@ public class GameState {
     public boolean isGameEnded() {
         return phase == GamePhase.FINISHED;
     }
-    
-    // Getters
+
+    // Getter 메서드들
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
-    
-    public GamePhase getPhase() {
-        return phase;
-    }
-    
-    public List<Integer> getRemainingMoves() {
-        return new ArrayList<>(remainingMoves);
-    }
-    
+
     public TokenPositionManager getTokenPositionManager() {
         return tokenPositionManager;
     }

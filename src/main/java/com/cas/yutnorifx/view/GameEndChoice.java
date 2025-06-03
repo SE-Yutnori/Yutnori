@@ -1,6 +1,6 @@
 package com.cas.yutnorifx.view;
-// 게임 시작, 재시작을 결정하기 위한 배열
+// 게임 종료 시 선택지를 나타내는 enum
 public enum GameEndChoice {
-    RESTART,
-    EXIT
+    RESTART, // 재시작
+    EXIT     // 종료
 }

@@ -4,21 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 플레이어의 정보가 담긴 클래스
- */
+//플레이어의 정보가 담긴 클래스
 public class Player {
-    //player 이름 attribute
-    private String name;
-    //player 보유 토큰 리스트
-    private List<Token> tokens;
+    private String name;            //플레이어 이름
+    private List<Token> tokens;     //보유 중인 말들
 
-    /**
-     * Player 생성자
-     * 토큰 개수 validation 및 tokenCount만큼 token 생성하여 list에 추가
-     * @param name : GameLauncher에서 값 입력받아 설정
-     * @param tokenCount : GameLauncher에서 값 입력받아 설정
-     */
     public Player(String name, int tokenCount) {
         this.name = name;
         this.tokens = new ArrayList<>();
@@ -44,10 +34,7 @@ public class Player {
         return tokens;
     }
 
-    /**
-     * 모든 토큰이 FINISHED 상태인 지를 통해 승리 플레이어 결정
-     * @return : 해당 플레이어 승리 여부 반환 (boolean)
-     */
+    //모든 토큰이 FINISHED 상태인 지를 통해 승리 플레이어 결정
     public boolean hasFinished() {
         for (Token token : tokens) {
             if (token.getState() != TokenState.FINISHED) {
@@ -56,72 +43,51 @@ public class Player {
         }
         return true;
     }
-    
-    /**
-     * 이동 가능한 토큰들을 반환 (FINISHED가 아닌 토큰들)
-     * @return 이동 가능한 토큰 리스트
-     */
+
+    //이동 가능한 토큰들을 반환 (FINISHED가 아닌 토큰들)
     public List<Token> getMovableTokens() {
         return tokens.stream()
                 .filter(token -> token.getState() != TokenState.FINISHED)
                 .collect(Collectors.toList());
     }
-    
-    /**
-     * 빽도로 이동 가능한 토큰들을 반환 (ACTIVE 상태인 토큰들)
-     * @return 빽도 이동 가능한 토큰 리스트
-     */
+
+    //빽도로 이동 가능한 토큰들을 반환 (ACTIVE 상태인 토큰들)
     public List<Token> getBackwardMovableTokens() {
         return tokens.stream()
                 .filter(token -> token.getState() == TokenState.ACTIVE)
                 .collect(Collectors.toList());
     }
-    
-    /**
-     * 대기 상태인 토큰들을 반환 (READY 상태인 토큰들)
-     * @return 대기 상태 토큰 리스트
-     */
+
+    //대기 상태인 토큰들을 반환 (READY 상태인 토큰들)
     public List<Token> getReadyTokens() {
         return tokens.stream()
                 .filter(token -> token.getState() == TokenState.READY)
                 .collect(Collectors.toList());
     }
-    
-    /**
-     * 게임 중인 토큰들을 반환 (ACTIVE 상태인 토큰들)
-     * @return 게임 중인 토큰 리스트
-     */
+
+    //게임 중인 토큰들을 반환 (ACTIVE 상태인 토큰들)
     public List<Token> getActiveTokens() {
         return tokens.stream()
                 .filter(token -> token.getState() == TokenState.ACTIVE)
                 .collect(Collectors.toList());
     }
-    
-    /**
-     * 완주한 토큰들을 반환 (FINISHED 상태인 토큰들)
-     * @return 완주한 토큰 리스트
-     */
+
+    //완주한 토큰들을 반환 (FINISHED 상태인 토큰들)
     public List<Token> getFinishedTokens() {
         return tokens.stream()
                 .filter(token -> token.getState() == TokenState.FINISHED)
                 .collect(Collectors.toList());
     }
-    
-    /**
-     * 특정 이름의 토큰을 찾아 반환
-     * @param tokenName 토큰 이름
-     * @return 해당 토큰 (없으면 null)
-     */
+
+    //특정 이름의 토큰을 찾아 반환
     public Token getTokenByName(String tokenName) {
         return tokens.stream()
                 .filter(token -> tokenName.equals(token.getName()))
                 .findFirst()
                 .orElse(null);
     }
-    
-    /**
-     * 모든 토큰을 초기 상태로 리셋
-     */
+
+    //모든 토큰을 초기 상태로 리셋
     public void resetAllTokens() {
         for (Token token : tokens) {
             if (token.getState() != TokenState.READY) {

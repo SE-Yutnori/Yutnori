@@ -1,9 +1,6 @@
 package com.cas.yutnorifx.view;
 
-import com.cas.yutnorifx.model.BoardNode;
-import com.cas.yutnorifx.model.Player;
-import com.cas.yutnorifx.model.Token;
-import com.cas.yutnorifx.model.TokenState;
+import com.cas.yutnorifx.model.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -12,23 +9,22 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InGameView {
-    // 보드 뷰
+    //보드, 플레이어, 플레이어 말 상태창
     private final BoardView boardView;
-    // 플레이어 리스트 (이름, Token 리스트 보유)
     private final List<Player> players;
-    // 오른쪽에 나타나는 상태 패널
-    // VBox : 수직 레이아웃 컨테이너
     private final VBox statusPanel;
 
-    // 플레이어 색상 배열
+    // 플레이어 색상은 임의 할당 (순서 임의 변경 불가)
     private final Color[] playerColors = {
             Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA
     };
 
-    //runnable 타입의 onRollYut 변수 선언
+    //onRollYut(윷을 던지는) 변수 선언
     private Runnable onRollYut;
 
     // InGameView 생성자
@@ -38,12 +34,37 @@ public class InGameView {
 
         //상태패널 VBox 생성
         this.statusPanel = new VBox(10);
-        //패널 패딩 설정
+        //패널 설정
         this.statusPanel.setPadding(new Insets(10));
-        //패널 너비 설정
         this.statusPanel.setPrefWidth(200);
-        //상태패널 빌드
         buildStatusPanel();
+    }
+
+    //순서 재배열 결과를 담는 클래스
+    public static class ReorderResult {
+        private final boolean success;
+        private final List<Integer> reorderedResults;
+        private final String errorMessage;
+
+        public static ReorderResult success(List<Integer> results) {
+            return new ReorderResult(true, results, null);
+        }
+
+        public static ReorderResult error(String message) {
+            return new ReorderResult(false, null, message);
+        }
+
+        private ReorderResult(boolean success, List<Integer> reorderedResults, String errorMessage) {
+            this.success = success;
+            this.reorderedResults = reorderedResults != null ? new ArrayList<>(reorderedResults) : null;
+            this.errorMessage = errorMessage;
+        }
+
+        public boolean isSuccess() { return success; }
+        public List<Integer> getReorderedResults() {
+            return reorderedResults != null ? new ArrayList<>(reorderedResults) : null;
+        }
+        public String getErrorMessage() { return errorMessage; }
     }
 
     public Pane getRoot() {
@@ -139,6 +160,41 @@ public class InGameView {
                 .orElse(null);
     }
 
+    public static InGameView.ReorderResult validateReorderInput(String input, List<Integer> originalResults) {
+        if (input == null || input.trim().isEmpty()) {
+            return InGameView.ReorderResult.error("입력이 비어있습니다.");
+        }
+
+        String[] parts = input.split(",");
+        if (parts.length != originalResults.size()) {
+            return InGameView.ReorderResult.error("입력 개수가 실제 개수와 다릅니다!");
+        }
+
+        List<Integer> reordered = new ArrayList<>();
+        try {
+            for (String p : parts) {
+                int val = Integer.parseInt(p.trim());
+                if ((val < -1 || val > 5) || val == 0) {
+                    return InGameView.ReorderResult.error("윷 값 (-1,1~5)을 벗어났습니다: " + val);
+                }
+                reordered.add(val);
+            }
+        } catch (NumberFormatException e) {
+            return InGameView.ReorderResult.error("숫자가 아닌 값이 포함되어 있습니다.");
+        }
+
+        List<Integer> sortedOrig = new ArrayList<>(originalResults);
+        List<Integer> sortedReorder = new ArrayList<>(reordered);
+        Collections.sort(sortedOrig);
+        Collections.sort(sortedReorder);
+
+        if (!sortedOrig.equals(sortedReorder)) {
+            return InGameView.ReorderResult.error("입력한 값이 실제 윷 결과와 다릅니다.");
+        }
+
+        return InGameView.ReorderResult.success(reordered);
+    }
+
     public BoardNode selectPath(List<BoardNode> options) {
         if (options.size() <= 1) {
             return options.get(0);
@@ -165,39 +221,30 @@ public class InGameView {
     }
 
     private void buildStatusPanel() {
-        //상태패널 자식 노드 제거
         statusPanel.getChildren().clear();
 
-        //플레이어 수만큼 반복
+        //플레이어 수만큼 반복해서
         for (int i = 0; i < players.size(); i++) {
-            //플레이어 객체 가져오기
+            //각 플레이어의 객체 가져오기
             Player player = players.get(i);
 
-            //플레이어 이름 레이블 생성
             Label playerLabel = new Label("<< " + player.getName() + " >>");
-            //플레이어 이름 레이블 폰트 설정
             playerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-            //상태패널에 플레이어 이름 레이블 추가
             statusPanel.getChildren().add(playerLabel);
-            
-            //플레이어 토큰 수만큼 반복
+
+            //플레이어 토큰 수만큼 반복하여
             for (Token token : player.getTokens()) {
-                //토큰 상태가 READY인 경우
+                //토큰 상태가져와서 보여주기
                 if (token.getState() == TokenState.READY) {
-                    //HBox : 수평 레이아웃 컨테이너
                     HBox tokenBox = new HBox(5);
-                    //Circle : 원형 모양 노드
                     Circle circle = new Circle(5, playerColors[i % playerColors.length]);
-                    //Label : 텍스트 레이블
                     Label tokenLabel = new Label(token.getName());
-                    //HBox에 원형 모양 노드와 텍스트 레이블 추가
                     tokenBox.getChildren().addAll(circle, tokenLabel);
-                    //상태패널에 HBox 추가
                     statusPanel.getChildren().add(tokenBox);
                 }
             }
 
-            //Separator : 구분선
+            //플레이어 구분선
             statusPanel.getChildren().add(new Separator());
         }
     }
