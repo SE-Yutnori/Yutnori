@@ -1,0 +1,38 @@
+@startuml
+participant GameController
+participant GameState
+participant YutGameRules
+participant TokenPositionManager
+participant Token
+participant BoardNode
+participant Function
+
+== 분기점 이동 로직 실행 ==
+GameController -> GameState: moveToken(\n    selectedToken,\n    steps,\n    options -> view.selectPath(options)\n)
+note right
+'options -> view.selectPath(options)'는
+분기점에 도달했을 때 호출되어
+사용자가 선택한 BoardNode를 반환하는 람다
+end note
+activate GameState
+
+GameState -> YutGameRules: moveToken(\n    actualToken,\n    steps,\n    tokenPositionManager,\n    branchSelector\n)
+note right
+branchSelector는 위 람다( options → view.selectPath(options) )가 전달됨
+end note
+activate YutGameRules
+
+YutGameRules -> TokenPositionManager: updateTokenPosition(token, nextNode)
+note right
+내부에서 분기점 여부에 따라
+branchSelector.apply(nextNodes) 호출 후,
+토큰 위치를 실제로 이동
+end note
+deactivate YutGameRules
+
+GameState --> GameController: MoveResult result
+note left
+이동 결과(성공/실패, 잡힘, 골인 등) 반환
+end note
+deactivate GameState
+@enduml

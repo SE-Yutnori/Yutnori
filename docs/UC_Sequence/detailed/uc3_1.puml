@@ -1,0 +1,14 @@
+@startuml
+boundary InGameView
+control GameController
+skinparam dpi 300
+
+== 분기점 선택 입력 처리 ==
+InGameView -> GameController: chooseBranch(selectedToken, direction)
+note right: 플레이어가 분기점에서 경로 선택 시 호출
+activate GameController
+
+GameController --> InGameView: disableBranchButtons()
+note left: 선택 완료 후 버튼 비활성화 (중복 입력 방지)
+deactivate GameController
+@enduml

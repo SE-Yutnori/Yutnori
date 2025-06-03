@@ -1,0 +1,25 @@
+@startuml
+boundary GameController
+boundary InGameView
+entity GameState
+entity TokenPositionManager
+entity BoardView
+
+== 분기점 이동 후 보드 갱신 및 뷰 리프레시 ==
+YutGameRules --> GameController: MoveResult result
+note left: 분기점 이동 및 후속 처리가 완료된 결과 반환
+activate GameController
+
+GameController -> GameState: updateTurnOrder()
+note right: 이동 결과에 따라 다음 플레이어로 턴 변경 또는 추가 턴 유지
+
+GameController -> InGameView: refresh()
+note right: InGameView.refresh() 호출
+
+InGameView -> BoardView: refresh()
+note right: 실제 보드와 토큰 상태를 화면에 다시 그리도록 요청
+activate BoardView
+
+deactivate BoardView
+deactivate GameController
+@enduml
