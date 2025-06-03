@@ -491,14 +491,26 @@ public class YutGameRules {
                 System.out.println("[WARNING] 예상하지 못한 이전 노드 형식: " + previousName);
             }
         } else {
-            // 5각형/6각형: 무조건 goal(ToCenter0-2)이 아닌 경로 선택
-            for (BoardNode node : nextNodes) {
-                if (!node.getName().equals("ToCenter0-2")) {
-                    System.out.println("[DEBUG] " + sides + "각형 기본 경로: " + node.getName() + " (goal 아닌 경로)");
-                    return node;
+            // 5각형/6각형: 보드 타입별 기본 경로 선택
+            if (sides == 6) {
+                // 6각형: 항상 ToCenter5-2 방향으로 나감
+                for (BoardNode node : nextNodes) {
+                    if (node.getName().equals("ToCenter5-2")) {
+                        System.out.println("[DEBUG] 6각형 기본 경로: " + node.getName());
+                        return node;
+                    }
                 }
+                System.out.println("[WARNING] 6각형에서 ToCenter5-2 경로를 찾지 못함");
+            } else {
+                // 5각형: goal(ToCenter0-2)이 아닌 경로 선택
+                for (BoardNode node : nextNodes) {
+                    if (!node.getName().equals("ToCenter0-2")) {
+                        System.out.println("[DEBUG] 5각형 기본 경로: " + node.getName() + " (goal 아닌 경로)");
+                        return node;
+                    }
+                }
+                System.out.println("[WARNING] 5각형에서 goal이 아닌 경로를 찾지 못함");
             }
-            System.out.println("[WARNING] " + sides + "각형에서 goal이 아닌 경로를 찾지 못함");
         }
         
         // fallback: 첫 번째 옵션
