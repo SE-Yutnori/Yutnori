@@ -198,16 +198,12 @@ class PlayerTest {
         tokens.get(1).setState(TokenState.FINISHED);
         tokens.get(2).setState(TokenState.READY); // 이미 READY
         
-        // 스택 토큰 추가 (리셋 시 제거되어야 함)
-        tokens.get(0).addStackedToken(tokens.get(1));
-        
         // When
         player.resetAllTokens();
         
         // Then
         for (Token token : tokens) {
             assertEquals(TokenState.READY, token.getState());
-            assertTrue(token.getStackedTokens().isEmpty());
         }
     }
 

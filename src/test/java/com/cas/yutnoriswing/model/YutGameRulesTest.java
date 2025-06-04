@@ -1,7 +1,5 @@
 package com.cas.yutnoriswing.model;
 
-import com.cas.yutnoriswing.YutnoriGameSwing;
-import com.cas.yutnoriswing.view.InGameView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;

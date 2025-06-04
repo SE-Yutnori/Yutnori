@@ -142,7 +142,7 @@ public class Board {
     //현재 노드의 이전 노드를 찾는 메서드 (빽도와 분기 선택을 위함)
     public BoardNode findPreviousNode(BoardNode currentNode) {
         if (currentNode == null) return null;
-
+        
         for (BoardNode node : nodes) {
             if (node.getNextNodes().contains(currentNode)) {
                 return node;

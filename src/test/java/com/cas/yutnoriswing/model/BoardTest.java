@@ -35,16 +35,23 @@ class BoardTest {
                 .anyMatch(node -> "Center".equals(node.getName()));
         assertTrue(hasCenterNode, "중앙 노드가 존재해야 함");
         
-        // 첫 번째 변의 시작 노드 확인 (Edge0-0)
-        boolean hasStartNode = nodes.stream()
-                .anyMatch(node -> "Edge0-0".equals(node.getName()));
-        assertTrue(hasStartNode, "Edge0-0 노드가 존재해야 함");
+        // 첫 번째 변의 모든 노드 확인 (Edge0-0 ~ Edge0-5)
+        for (int j = 0; j <= 5; j++) {
+            String nodeName = "Edge0-" + j;
+            boolean hasNode = nodes.stream()
+                    .anyMatch(node -> nodeName.equals(node.getName()));
+            assertTrue(hasNode, nodeName + " 노드가 존재해야 함");
+        }
         
-        // 각 변의 첫 번째 노드들은 실제로는 이전 변의 마지막 노드와 공유됨
-        // 따라서 Edge0-5 노드가 존재하는지 확인
-        boolean hasEdge0End = nodes.stream()
-                .anyMatch(node -> "Edge0-5".equals(node.getName()));
-        assertTrue(hasEdge0End, "Edge0-5 노드가 존재해야 함");
+        // 나머지 변들의 노드 확인 (모서리 공유로 인해 j=1부터 시작)
+        for (int i = 1; i < 4; i++) {
+            for (int j = 1; j <= 5; j++) {
+                String nodeName = "Edge" + i + "-" + j;
+                boolean hasNode = nodes.stream()
+                        .anyMatch(node -> nodeName.equals(node.getName()));
+                assertTrue(hasNode, nodeName + " 노드가 존재해야 함");
+            }
+        }
     }
 
     @Test
@@ -100,6 +107,7 @@ class BoardTest {
                         .anyMatch(node -> nodeName.equals(node.getName()));
                 assertTrue(hasNode, nodeName + " 노드가 존재해야 함");
             }
+
         }
     }
 

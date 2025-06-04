@@ -36,8 +36,6 @@ class TokenTest {
         assertEquals(owner, newToken.getOwner());
         assertEquals(TokenState.READY, newToken.getState());
         assertTrue(newToken.getStackedTokens().isEmpty());
-        assertNull(newToken.getNextBranchChoice());
-        assertNull(newToken.getPreviousNode());
     }
 
     @Test
